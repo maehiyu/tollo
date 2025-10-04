@@ -1,4 +1,4 @@
-# tolla
+# tollo
 
 ## プロジェクト概要
 本プロジェクトは、Q&Aプラットフォームをマイクロサービスアーキテクチャで構築しています。
@@ -6,7 +6,6 @@
 ## ドキュメント
 - **要求仕様**: [docs/01_requirement.md](docs/01_requirement.md)
 - **アーキテクチャ**: [docs/02_architecture.md](docs/02_architecture.md)
-- **API仕様**: [docs/openapi.yaml](docs/openapi.yaml)
 
 ## 開発環境
 - Go: 1.24.4
