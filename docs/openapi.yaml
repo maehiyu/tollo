@@ -1,0 +1,344 @@
+openapi: 3.0.0
+info:
+  title: Q&A Platform API
+  version: 1.0.0
+  description: Q&AプラットフォームのAPI仕様
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ユーザーID
+        email:
+          type: string
+          format: email
+          description: メールアドレス
+        name:
+          type: string
+          description: ユーザー名
+        type:
+          type: string
+          enum: [general, professional]
+          description: ユーザー種別 (一般ユーザー, プロフェッショナル)
+        profile_text:
+          type: string
+          nullable: true
+          description: プロフェッショナルのプロフィール文
+        subscription_status:
+          type: string
+          enum: [active, inactive, cancelled]
+          nullable: true
+          description: 一般ユーザーのサブスクリプション状態
+      required:
+        - id
+        - email
+        - name
+        - type
+
+    Question:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 質問ID
+        conversation_id:
+          type: string
+          format: uuid
+          description: 質問が属する会話のID
+        title:
+          type: string
+          description: 質問タイトル
+        content:
+          type: string
+          description: 質問内容
+        author_id:
+          type: string
+          format: uuid
+          description: 質問投稿者のユーザーID
+        category:
+          type: string
+          description: カテゴリ
+        tags:
+          type: array
+          items:
+            type: string
+          description: タグリスト
+        difficulty:
+          type: string
+          enum: [easy, medium, hard]
+          description: 質問の難易度
+        status:
+          type: string
+          enum: [open, answered, closed]
+          description: 質問の状態
+        created_at:
+          type: string
+          format: date-time
+          description: 作成日時
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新日時
+      required:
+        - id
+        - title
+        - content
+        - author_id
+        - category
+        - status
+        - created_at
+
+    Answer:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 回答ID
+        question_id:
+          type: string
+          format: uuid
+          description: 回答対象の質問ID
+        author_id:
+          type: string
+          format: uuid
+          description: 回答投稿者のユーザーID (プロフェッショナル)
+        content:
+          type: string
+          description: 回答内容
+        rating:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          nullable: true
+          description: 回答の評価 (1-5段階)
+        created_at:
+          type: string
+          format: date-time
+          description: 作成日時
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新日時
+      required:
+        - id
+        - question_id
+        - author_id
+        - content
+        - created_at
+
+    Reward:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: リワードID
+        professional_user_id:
+          type: string
+          format: uuid
+          description: リワード付与対象のプロユーザーID
+        question_id:
+          type: string
+          format: uuid
+          description: 対象の質問ID
+        answer_id:
+          type: string
+          format: uuid
+          description: 対象の回答ID
+        amount:
+          type: number
+          format: float
+          description: リワード額
+        currency:
+          type: string
+          description: 通貨単位 (例: JPY)
+        status:
+          type: string
+          enum: [pending, calculated, paid, cancelled]
+          description: リワードの状態
+        calculated_at:
+          type: string
+          format: date-time
+          description: 計算日時
+        paid_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: 支払い完了日時
+      required:
+        - id
+        - professional_user_id
+        - amount
+        - currency
+        - status
+        - calculated_at
+
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: サブスクリプションID
+        user_id:
+          type: string
+          format: uuid
+          description: サブスクリプションユーザーID
+        plan_id:
+          type: string
+          description: プランID
+        status:
+          type: string
+          enum: [active, inactive, cancelled]
+          description: サブスクリプション状態
+        start_date:
+          type: string
+          format: date-time
+          description: 開始日時
+        end_date:
+          type: string
+          format: date-time
+          nullable: true
+          description: 終了日時
+      required:
+        - id
+        - user_id
+        - plan_id
+        - status
+        - start_date
+
+    Promotion:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: プロモーションID
+        professional_user_id:
+          type: string
+          format: uuid
+          description: プロモーション実施プロユーザーID
+        title:
+          type: string
+          description: プロモーションタイトル
+        description:
+          type: string
+          description: プロモーション詳細
+        target_url:
+          type: string
+          format: uri
+          description: プロモーションのリンク先URL
+        start_date:
+          type: string
+          format: date-time
+          description: 開始日時
+        end_date:
+          type: string
+          format: date-time
+          description: 終了日時
+        status:
+          type: string
+          enum: [active, inactive, completed]
+          description: プロモーション状態
+      required:
+        - id
+        - professional_user_id
+        - title
+        - target_url
+        - start_date
+        - end_date
+        - status
+
+    Event:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: イベントID
+        professional_user_id:
+          type: string
+          format: uuid
+          description: イベント主催プロユーザーID
+        title:
+          type: string
+          description: イベントタイトル
+        description:
+          type: string
+          description: イベント詳細
+        start_time:
+          type: string
+          format: date-time
+          description: 開始日時
+        end_time:
+          type: string
+          format: date-time
+          description: 終了日時
+        max_attendees:
+          type: integer
+          format: int32
+          minimum: 1
+          description: 最大参加者数
+        status:
+          type: string
+          enum: [scheduled, active, completed, cancelled]
+          description: イベント状態
+      required:
+        - id
+        - professional_user_id
+        - title
+        - start_time
+        - end_time
+        - status
+
+    Conversation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 会話ID
+        owner_id:
+          type: string
+          format: uuid
+          description: 会話の作成者（グループチャットの場合のオーナーなど）
+        type:
+          type: string
+          enum: [private, group] 
+          description: 会話の種別
+        title:
+          type: string
+          description: 会話のタイトル（最初の質問から自動生成など）
+        participants:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: 会話に参加しているユーザーIDのリスト
+        status:
+          type: string
+          enum: [open, closed, archived]
+          description: 会話の状態
+        created_at:
+          type: string
+          format: date-time
+          description: 作成日時
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新日時
+      required:
+        - id
+        - owner_id
+        - type
+        - title
+        - participants
+        - status
+        - created_at

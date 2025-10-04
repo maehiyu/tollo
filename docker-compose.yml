@@ -1,0 +1,29 @@
+services:
+  userservice:
+    build: 
+      context: ./userservice
+      dockerfile: build/docker/userservice.dockerfile
+    ports:
+      - "50051:50051"
+    environment:
+      DATABASE_URL: postgres://user:password@db:5432/users_db?sslmode=disable
+    depends_on:
+      - user_db
+    networks:
+      - app-networks
+  user_db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: users_db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+    networks:
+      - app-networks
+
+networks:
+  app-networks:
+    driver: bridge
+volumes:
+  user_db_data:

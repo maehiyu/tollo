@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package userservice;
+
+option go_package = "github.com/maehiyu/tollo/protos/userservice";
+
+import "google/protobuf/timestamp.proto";
+
+service UserService {
+  rpc CreateUser(CreateUserRequest) returns (UserResponse);
+  rpc GetUser(GetUserRequest) returns (UserResponse);
+}
+
+message ProProfile {
+  string pro_badge_url = 1;
+}
+
+message GeneralProfile {
+  uint32 points = 1;
+}
+
+message UserResponse {
+  string id = 1;         // UUID v4
+  string name = 2;
+  string email = 3;
+  string description = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+
+  oneof profile {
+    ProProfile pro = 7;
+    GeneralProfile general = 8;
+  } 
+}
+
+// CreateUserのリクエスト
+message CreateUserRequest {
+  string name = 1;
+  string email = 2;
+}
+
+// GetUserのリクエスト
+message GetUserRequest {
+  oneof lookup_by {
+    string id = 1;         // UUID v4
+    string email = 2;
+  }
+}
