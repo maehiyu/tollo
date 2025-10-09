@@ -9,6 +9,8 @@ package userservice
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	fieldmaskpb "google.golang.org/protobuf/types/known/fieldmaskpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
@@ -22,27 +24,27 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type ProProfile struct {
+type ProfessionalProfile struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ProBadgeUrl   string                 `protobuf:"bytes,1,opt,name=pro_badge_url,json=proBadgeUrl,proto3" json:"pro_badge_url,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *ProProfile) Reset() {
-	*x = ProProfile{}
+func (x *ProfessionalProfile) Reset() {
+	*x = ProfessionalProfile{}
 	mi := &file_userservice_user_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ProProfile) String() string {
+func (x *ProfessionalProfile) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ProProfile) ProtoMessage() {}
+func (*ProfessionalProfile) ProtoMessage() {}
 
-func (x *ProProfile) ProtoReflect() protoreflect.Message {
+func (x *ProfessionalProfile) ProtoReflect() protoreflect.Message {
 	mi := &file_userservice_user_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -54,12 +56,12 @@ func (x *ProProfile) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ProProfile.ProtoReflect.Descriptor instead.
-func (*ProProfile) Descriptor() ([]byte, []int) {
+// Deprecated: Use ProfessionalProfile.ProtoReflect.Descriptor instead.
+func (*ProfessionalProfile) Descriptor() ([]byte, []int) {
 	return file_userservice_user_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *ProProfile) GetProBadgeUrl() string {
+func (x *ProfessionalProfile) GetProBadgeUrl() string {
 	if x != nil {
 		return x.ProBadgeUrl
 	}
@@ -110,7 +112,7 @@ func (x *GeneralProfile) GetPoints() uint32 {
 	return 0
 }
 
-type UserResponse struct {
+type UserInfo struct {
 	state       protoimpl.MessageState `protogen:"open.v1"`
 	Id          string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // UUID v4
 	Name        string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
@@ -120,27 +122,27 @@ type UserResponse struct {
 	UpdatedAt   *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	// Types that are valid to be assigned to Profile:
 	//
-	//	*UserResponse_Pro
-	//	*UserResponse_General
-	Profile       isUserResponse_Profile `protobuf_oneof:"profile"`
+	//	*UserInfo_Pro
+	//	*UserInfo_General
+	Profile       isUserInfo_Profile `protobuf_oneof:"profile"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UserResponse) Reset() {
-	*x = UserResponse{}
+func (x *UserInfo) Reset() {
+	*x = UserInfo{}
 	mi := &file_userservice_user_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UserResponse) String() string {
+func (x *UserInfo) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UserResponse) ProtoMessage() {}
+func (*UserInfo) ProtoMessage() {}
 
-func (x *UserResponse) ProtoReflect() protoreflect.Message {
+func (x *UserInfo) ProtoReflect() protoreflect.Message {
 	mi := &file_userservice_user_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -152,99 +154,104 @@ func (x *UserResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserResponse.ProtoReflect.Descriptor instead.
-func (*UserResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use UserInfo.ProtoReflect.Descriptor instead.
+func (*UserInfo) Descriptor() ([]byte, []int) {
 	return file_userservice_user_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *UserResponse) GetId() string {
+func (x *UserInfo) GetId() string {
 	if x != nil {
 		return x.Id
 	}
 	return ""
 }
 
-func (x *UserResponse) GetName() string {
+func (x *UserInfo) GetName() string {
 	if x != nil {
 		return x.Name
 	}
 	return ""
 }
 
-func (x *UserResponse) GetEmail() string {
+func (x *UserInfo) GetEmail() string {
 	if x != nil {
 		return x.Email
 	}
 	return ""
 }
 
-func (x *UserResponse) GetDescription() string {
+func (x *UserInfo) GetDescription() string {
 	if x != nil {
 		return x.Description
 	}
 	return ""
 }
 
-func (x *UserResponse) GetCreatedAt() *timestamppb.Timestamp {
+func (x *UserInfo) GetCreatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.CreatedAt
 	}
 	return nil
 }
 
-func (x *UserResponse) GetUpdatedAt() *timestamppb.Timestamp {
+func (x *UserInfo) GetUpdatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.UpdatedAt
 	}
 	return nil
 }
 
-func (x *UserResponse) GetProfile() isUserResponse_Profile {
+func (x *UserInfo) GetProfile() isUserInfo_Profile {
 	if x != nil {
 		return x.Profile
 	}
 	return nil
 }
 
-func (x *UserResponse) GetPro() *ProProfile {
+func (x *UserInfo) GetPro() *ProfessionalProfile {
 	if x != nil {
-		if x, ok := x.Profile.(*UserResponse_Pro); ok {
+		if x, ok := x.Profile.(*UserInfo_Pro); ok {
 			return x.Pro
 		}
 	}
 	return nil
 }
 
-func (x *UserResponse) GetGeneral() *GeneralProfile {
+func (x *UserInfo) GetGeneral() *GeneralProfile {
 	if x != nil {
-		if x, ok := x.Profile.(*UserResponse_General); ok {
+		if x, ok := x.Profile.(*UserInfo_General); ok {
 			return x.General
 		}
 	}
 	return nil
 }
 
-type isUserResponse_Profile interface {
-	isUserResponse_Profile()
+type isUserInfo_Profile interface {
+	isUserInfo_Profile()
 }
 
-type UserResponse_Pro struct {
-	Pro *ProProfile `protobuf:"bytes,7,opt,name=pro,proto3,oneof"`
+type UserInfo_Pro struct {
+	Pro *ProfessionalProfile `protobuf:"bytes,7,opt,name=pro,proto3,oneof"`
 }
 
-type UserResponse_General struct {
+type UserInfo_General struct {
 	General *GeneralProfile `protobuf:"bytes,8,opt,name=general,proto3,oneof"`
 }
 
-func (*UserResponse_Pro) isUserResponse_Profile() {}
+func (*UserInfo_Pro) isUserInfo_Profile() {}
 
-func (*UserResponse_General) isUserResponse_Profile() {}
+func (*UserInfo_General) isUserInfo_Profile() {}
 
-// CreateUserのリクエスト
 type CreateUserRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	Name        string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Email       string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
+	Description string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	// Types that are valid to be assigned to Profile:
+	//
+	//	*CreateUserRequest_Professional
+	//	*CreateUserRequest_General
+	Profile       isCreateUserRequest_Profile `protobuf_oneof:"profile"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -293,7 +300,54 @@ func (x *CreateUserRequest) GetEmail() string {
 	return ""
 }
 
-// GetUserのリクエスト
+func (x *CreateUserRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *CreateUserRequest) GetProfile() isCreateUserRequest_Profile {
+	if x != nil {
+		return x.Profile
+	}
+	return nil
+}
+
+func (x *CreateUserRequest) GetProfessional() *ProfessionalProfile {
+	if x != nil {
+		if x, ok := x.Profile.(*CreateUserRequest_Professional); ok {
+			return x.Professional
+		}
+	}
+	return nil
+}
+
+func (x *CreateUserRequest) GetGeneral() *GeneralProfile {
+	if x != nil {
+		if x, ok := x.Profile.(*CreateUserRequest_General); ok {
+			return x.General
+		}
+	}
+	return nil
+}
+
+type isCreateUserRequest_Profile interface {
+	isCreateUserRequest_Profile()
+}
+
+type CreateUserRequest_Professional struct {
+	Professional *ProfessionalProfile `protobuf:"bytes,4,opt,name=professional,proto3,oneof"`
+}
+
+type CreateUserRequest_General struct {
+	General *GeneralProfile `protobuf:"bytes,5,opt,name=general,proto3,oneof"`
+}
+
+func (*CreateUserRequest_Professional) isCreateUserRequest_Profile() {}
+
+func (*CreateUserRequest_General) isCreateUserRequest_Profile() {}
+
 type GetUserRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to LookupBy:
@@ -376,17 +430,120 @@ func (*GetUserRequest_Id) isGetUserRequest_LookupBy() {}
 
 func (*GetUserRequest_Email) isGetUserRequest_LookupBy() {}
 
+type UpdateUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Data          *UserInfo              `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
+	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,3,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserRequest) Reset() {
+	*x = UpdateUserRequest{}
+	mi := &file_userservice_user_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserRequest) ProtoMessage() {}
+
+func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_userservice_user_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserRequest.ProtoReflect.Descriptor instead.
+func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
+	return file_userservice_user_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *UpdateUserRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateUserRequest) GetData() *UserInfo {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+func (x *UpdateUserRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.UpdateMask
+	}
+	return nil
+}
+
+type DeleteUserRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteUserRequest) Reset() {
+	*x = DeleteUserRequest{}
+	mi := &file_userservice_user_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteUserRequest) ProtoMessage() {}
+
+func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_userservice_user_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteUserRequest.ProtoReflect.Descriptor instead.
+func (*DeleteUserRequest) Descriptor() ([]byte, []int) {
+	return file_userservice_user_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *DeleteUserRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
 var File_userservice_user_proto protoreflect.FileDescriptor
 
 const file_userservice_user_proto_rawDesc = "" +
 	"\n" +
-	"\x16userservice/user.proto\x12\vuserservice\x1a\x1fgoogle/protobuf/timestamp.proto\"0\n" +
-	"\n" +
-	"ProProfile\x12\"\n" +
+	"\x16userservice/user.proto\x12\vuserservice\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x1bgoogle/protobuf/empty.proto\"9\n" +
+	"\x13ProfessionalProfile\x12\"\n" +
 	"\rpro_badge_url\x18\x01 \x01(\tR\vproBadgeUrl\"(\n" +
 	"\x0eGeneralProfile\x12\x16\n" +
-	"\x06points\x18\x01 \x01(\rR\x06points\"\xd1\x02\n" +
-	"\fUserResponse\x12\x0e\n" +
+	"\x06points\x18\x01 \x01(\rR\x06points\"\xd6\x02\n" +
+	"\bUserInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
 	"\x05email\x18\x03 \x01(\tR\x05email\x12 \n" +
@@ -394,21 +551,36 @@ const file_userservice_user_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12+\n" +
-	"\x03pro\x18\a \x01(\v2\x17.userservice.ProProfileH\x00R\x03pro\x127\n" +
+	"updated_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x124\n" +
+	"\x03pro\x18\a \x01(\v2 .userservice.ProfessionalProfileH\x00R\x03pro\x127\n" +
 	"\ageneral\x18\b \x01(\v2\x1b.userservice.GeneralProfileH\x00R\ageneralB\t\n" +
-	"\aprofile\"=\n" +
+	"\aprofile\"\xeb\x01\n" +
 	"\x11CreateUserRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05email\"G\n" +
+	"\x05email\x18\x02 \x01(\tR\x05email\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12F\n" +
+	"\fprofessional\x18\x04 \x01(\v2 .userservice.ProfessionalProfileH\x00R\fprofessional\x127\n" +
+	"\ageneral\x18\x05 \x01(\v2\x1b.userservice.GeneralProfileH\x00R\ageneralB\t\n" +
+	"\aprofile\"G\n" +
 	"\x0eGetUserRequest\x12\x10\n" +
 	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x12\x16\n" +
 	"\x05email\x18\x02 \x01(\tH\x00R\x05emailB\v\n" +
-	"\tlookup_by2\x99\x01\n" +
-	"\vUserService\x12G\n" +
+	"\tlookup_by\"\x8b\x01\n" +
+	"\x11UpdateUserRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12)\n" +
+	"\x04data\x18\x02 \x01(\v2\x15.userservice.UserInfoR\x04data\x12;\n" +
+	"\vupdate_mask\x18\x03 \x01(\v2\x1a.google.protobuf.FieldMaskR\n" +
+	"updateMask\"#\n" +
+	"\x11DeleteUserRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id2\x9c\x02\n" +
+	"\vUserService\x12C\n" +
 	"\n" +
-	"CreateUser\x12\x1e.userservice.CreateUserRequest\x1a\x19.userservice.UserResponse\x12A\n" +
-	"\aGetUser\x12\x1b.userservice.GetUserRequest\x1a\x19.userservice.UserResponseB-Z+github.com/maehiyu/tollo/protos/userserviceb\x06proto3"
+	"CreateUser\x12\x1e.userservice.CreateUserRequest\x1a\x15.userservice.UserInfo\x12=\n" +
+	"\aGetUser\x12\x1b.userservice.GetUserRequest\x1a\x15.userservice.UserInfo\x12C\n" +
+	"\n" +
+	"UpdateUser\x12\x1e.userservice.UpdateUserRequest\x1a\x15.userservice.UserInfo\x12D\n" +
+	"\n" +
+	"DeleteUser\x12\x1e.userservice.DeleteUserRequest\x1a\x16.google.protobuf.EmptyB-Z+github.com/maehiyu/tollo/protos/userserviceb\x06proto3"
 
 var (
 	file_userservice_user_proto_rawDescOnce sync.Once
@@ -422,29 +594,41 @@ func file_userservice_user_proto_rawDescGZIP() []byte {
 	return file_userservice_user_proto_rawDescData
 }
 
-var file_userservice_user_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_userservice_user_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_userservice_user_proto_goTypes = []any{
-	(*ProProfile)(nil),            // 0: userservice.ProProfile
+	(*ProfessionalProfile)(nil),   // 0: userservice.ProfessionalProfile
 	(*GeneralProfile)(nil),        // 1: userservice.GeneralProfile
-	(*UserResponse)(nil),          // 2: userservice.UserResponse
+	(*UserInfo)(nil),              // 2: userservice.UserInfo
 	(*CreateUserRequest)(nil),     // 3: userservice.CreateUserRequest
 	(*GetUserRequest)(nil),        // 4: userservice.GetUserRequest
-	(*timestamppb.Timestamp)(nil), // 5: google.protobuf.Timestamp
+	(*UpdateUserRequest)(nil),     // 5: userservice.UpdateUserRequest
+	(*DeleteUserRequest)(nil),     // 6: userservice.DeleteUserRequest
+	(*timestamppb.Timestamp)(nil), // 7: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil), // 8: google.protobuf.FieldMask
+	(*emptypb.Empty)(nil),         // 9: google.protobuf.Empty
 }
 var file_userservice_user_proto_depIdxs = []int32{
-	5, // 0: userservice.UserResponse.created_at:type_name -> google.protobuf.Timestamp
-	5, // 1: userservice.UserResponse.updated_at:type_name -> google.protobuf.Timestamp
-	0, // 2: userservice.UserResponse.pro:type_name -> userservice.ProProfile
-	1, // 3: userservice.UserResponse.general:type_name -> userservice.GeneralProfile
-	3, // 4: userservice.UserService.CreateUser:input_type -> userservice.CreateUserRequest
-	4, // 5: userservice.UserService.GetUser:input_type -> userservice.GetUserRequest
-	2, // 6: userservice.UserService.CreateUser:output_type -> userservice.UserResponse
-	2, // 7: userservice.UserService.GetUser:output_type -> userservice.UserResponse
-	6, // [6:8] is the sub-list for method output_type
-	4, // [4:6] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	7,  // 0: userservice.UserInfo.created_at:type_name -> google.protobuf.Timestamp
+	7,  // 1: userservice.UserInfo.updated_at:type_name -> google.protobuf.Timestamp
+	0,  // 2: userservice.UserInfo.pro:type_name -> userservice.ProfessionalProfile
+	1,  // 3: userservice.UserInfo.general:type_name -> userservice.GeneralProfile
+	0,  // 4: userservice.CreateUserRequest.professional:type_name -> userservice.ProfessionalProfile
+	1,  // 5: userservice.CreateUserRequest.general:type_name -> userservice.GeneralProfile
+	2,  // 6: userservice.UpdateUserRequest.data:type_name -> userservice.UserInfo
+	8,  // 7: userservice.UpdateUserRequest.update_mask:type_name -> google.protobuf.FieldMask
+	3,  // 8: userservice.UserService.CreateUser:input_type -> userservice.CreateUserRequest
+	4,  // 9: userservice.UserService.GetUser:input_type -> userservice.GetUserRequest
+	5,  // 10: userservice.UserService.UpdateUser:input_type -> userservice.UpdateUserRequest
+	6,  // 11: userservice.UserService.DeleteUser:input_type -> userservice.DeleteUserRequest
+	2,  // 12: userservice.UserService.CreateUser:output_type -> userservice.UserInfo
+	2,  // 13: userservice.UserService.GetUser:output_type -> userservice.UserInfo
+	2,  // 14: userservice.UserService.UpdateUser:output_type -> userservice.UserInfo
+	9,  // 15: userservice.UserService.DeleteUser:output_type -> google.protobuf.Empty
+	12, // [12:16] is the sub-list for method output_type
+	8,  // [8:12] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_userservice_user_proto_init() }
@@ -453,8 +637,12 @@ func file_userservice_user_proto_init() {
 		return
 	}
 	file_userservice_user_proto_msgTypes[2].OneofWrappers = []any{
-		(*UserResponse_Pro)(nil),
-		(*UserResponse_General)(nil),
+		(*UserInfo_Pro)(nil),
+		(*UserInfo_General)(nil),
+	}
+	file_userservice_user_proto_msgTypes[3].OneofWrappers = []any{
+		(*CreateUserRequest_Professional)(nil),
+		(*CreateUserRequest_General)(nil),
 	}
 	file_userservice_user_proto_msgTypes[4].OneofWrappers = []any{
 		(*GetUserRequest_Id)(nil),
@@ -466,7 +654,7 @@ func file_userservice_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_userservice_user_proto_rawDesc), len(file_userservice_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

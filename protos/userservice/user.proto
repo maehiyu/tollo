@@ -5,13 +5,17 @@ package userservice;
 option go_package = "github.com/maehiyu/tollo/protos/userservice";
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/empty.proto";
 
 service UserService {
-  rpc CreateUser(CreateUserRequest) returns (UserResponse);
-  rpc GetUser(GetUserRequest) returns (UserResponse);
+  rpc CreateUser(CreateUserRequest) returns (UserInfo);
+  rpc GetUser(GetUserRequest) returns (UserInfo);
+  rpc UpdateUser(UpdateUserRequest) returns (UserInfo);
+  rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty);
 }
 
-message ProProfile {
+message ProfessionalProfile {
   string pro_badge_url = 1;
 }
 
@@ -19,7 +23,7 @@ message GeneralProfile {
   uint32 points = 1;
 }
 
-message UserResponse {
+message UserInfo {
   string id = 1;         // UUID v4
   string name = 2;
   string email = 3;
@@ -28,21 +32,35 @@ message UserResponse {
   google.protobuf.Timestamp updated_at = 6;
 
   oneof profile {
-    ProProfile pro = 7;
+    ProfessionalProfile pro = 7;
     GeneralProfile general = 8;
   } 
 }
 
-// CreateUserのリクエスト
 message CreateUserRequest {
   string name = 1;
   string email = 2;
+  string description = 3;
+  oneof profile {
+    ProfessionalProfile professional = 4;
+    GeneralProfile general = 5;
+  }
 }
 
-// GetUserのリクエスト
 message GetUserRequest {
   oneof lookup_by {
     string id = 1;         // UUID v4
     string email = 2;
   }
 }
+
+message UpdateUserRequest {
+  string id = 1;
+  UserInfo data = 2;
+  google.protobuf.FieldMask update_mask = 3;  
+}
+
+message DeleteUserRequest {
+  string id = 1;
+}
+
