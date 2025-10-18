@@ -27,6 +27,7 @@ const (
 type ProfessionalProfile struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ProBadgeUrl   string                 `protobuf:"bytes,1,opt,name=pro_badge_url,json=proBadgeUrl,proto3" json:"pro_badge_url,omitempty"`
+	Biography     string                 `protobuf:"bytes,2,opt,name=biography,proto3" json:"biography,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -68,9 +69,17 @@ func (x *ProfessionalProfile) GetProBadgeUrl() string {
 	return ""
 }
 
+func (x *ProfessionalProfile) GetBiography() string {
+	if x != nil {
+		return x.Biography
+	}
+	return ""
+}
+
 type GeneralProfile struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Points        uint32                 `protobuf:"varint,1,opt,name=points,proto3" json:"points,omitempty"`
+	Introduction  string                 `protobuf:"bytes,2,opt,name=introduction,proto3" json:"introduction,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -112,18 +121,24 @@ func (x *GeneralProfile) GetPoints() uint32 {
 	return 0
 }
 
+func (x *GeneralProfile) GetIntroduction() string {
+	if x != nil {
+		return x.Introduction
+	}
+	return ""
+}
+
 type UserInfo struct {
-	state       protoimpl.MessageState `protogen:"open.v1"`
-	Id          string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // UUID v4
-	Name        string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Email       string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	Description string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
-	CreatedAt   *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt   *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Id        string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // UUID v4
+	Name      string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Email     string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	// Types that are valid to be assigned to Profile:
 	//
-	//	*UserInfo_Pro
-	//	*UserInfo_General
+	//	*UserInfo_ProfessionalProfile
+	//	*UserInfo_GeneralProfile
 	Profile       isUserInfo_Profile `protobuf_oneof:"profile"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -180,13 +195,6 @@ func (x *UserInfo) GetEmail() string {
 	return ""
 }
 
-func (x *UserInfo) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
-
 func (x *UserInfo) GetCreatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.CreatedAt
@@ -208,19 +216,19 @@ func (x *UserInfo) GetProfile() isUserInfo_Profile {
 	return nil
 }
 
-func (x *UserInfo) GetPro() *ProfessionalProfile {
+func (x *UserInfo) GetProfessionalProfile() *ProfessionalProfile {
 	if x != nil {
-		if x, ok := x.Profile.(*UserInfo_Pro); ok {
-			return x.Pro
+		if x, ok := x.Profile.(*UserInfo_ProfessionalProfile); ok {
+			return x.ProfessionalProfile
 		}
 	}
 	return nil
 }
 
-func (x *UserInfo) GetGeneral() *GeneralProfile {
+func (x *UserInfo) GetGeneralProfile() *GeneralProfile {
 	if x != nil {
-		if x, ok := x.Profile.(*UserInfo_General); ok {
-			return x.General
+		if x, ok := x.Profile.(*UserInfo_GeneralProfile); ok {
+			return x.GeneralProfile
 		}
 	}
 	return nil
@@ -230,17 +238,17 @@ type isUserInfo_Profile interface {
 	isUserInfo_Profile()
 }
 
-type UserInfo_Pro struct {
-	Pro *ProfessionalProfile `protobuf:"bytes,7,opt,name=pro,proto3,oneof"`
+type UserInfo_ProfessionalProfile struct {
+	ProfessionalProfile *ProfessionalProfile `protobuf:"bytes,7,opt,name=professional_profile,json=professionalProfile,proto3,oneof"`
 }
 
-type UserInfo_General struct {
-	General *GeneralProfile `protobuf:"bytes,8,opt,name=general,proto3,oneof"`
+type UserInfo_GeneralProfile struct {
+	GeneralProfile *GeneralProfile `protobuf:"bytes,8,opt,name=general_profile,json=generalProfile,proto3,oneof"`
 }
 
-func (*UserInfo_Pro) isUserInfo_Profile() {}
+func (*UserInfo_ProfessionalProfile) isUserInfo_Profile() {}
 
-func (*UserInfo_General) isUserInfo_Profile() {}
+func (*UserInfo_GeneralProfile) isUserInfo_Profile() {}
 
 type CreateUserRequest struct {
 	state       protoimpl.MessageState `protogen:"open.v1"`
@@ -538,22 +546,23 @@ var File_userservice_user_proto protoreflect.FileDescriptor
 
 const file_userservice_user_proto_rawDesc = "" +
 	"\n" +
-	"\x16userservice/user.proto\x12\vuserservice\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x1bgoogle/protobuf/empty.proto\"9\n" +
+	"\x16userservice/user.proto\x12\vuserservice\x1a\x1fgoogle/protobuf/timestamp.proto\x1a google/protobuf/field_mask.proto\x1a\x1bgoogle/protobuf/empty.proto\"W\n" +
 	"\x13ProfessionalProfile\x12\"\n" +
-	"\rpro_badge_url\x18\x01 \x01(\tR\vproBadgeUrl\"(\n" +
+	"\rpro_badge_url\x18\x01 \x01(\tR\vproBadgeUrl\x12\x1c\n" +
+	"\tbiography\x18\x02 \x01(\tR\tbiography\"L\n" +
 	"\x0eGeneralProfile\x12\x16\n" +
-	"\x06points\x18\x01 \x01(\rR\x06points\"\xd6\x02\n" +
+	"\x06points\x18\x01 \x01(\rR\x06points\x12\"\n" +
+	"\fintroduction\x18\x02 \x01(\tR\fintroduction\"\xe4\x02\n" +
 	"\bUserInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
-	"\x05email\x18\x03 \x01(\tR\x05email\x12 \n" +
-	"\vdescription\x18\x04 \x01(\tR\vdescription\x129\n" +
+	"\x05email\x18\x03 \x01(\tR\x05email\x129\n" +
 	"\n" +
 	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x124\n" +
-	"\x03pro\x18\a \x01(\v2 .userservice.ProfessionalProfileH\x00R\x03pro\x127\n" +
-	"\ageneral\x18\b \x01(\v2\x1b.userservice.GeneralProfileH\x00R\ageneralB\t\n" +
+	"updated_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12U\n" +
+	"\x14professional_profile\x18\a \x01(\v2 .userservice.ProfessionalProfileH\x00R\x13professionalProfile\x12F\n" +
+	"\x0fgeneral_profile\x18\b \x01(\v2\x1b.userservice.GeneralProfileH\x00R\x0egeneralProfileB\t\n" +
 	"\aprofile\"\xeb\x01\n" +
 	"\x11CreateUserRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
@@ -610,8 +619,8 @@ var file_userservice_user_proto_goTypes = []any{
 var file_userservice_user_proto_depIdxs = []int32{
 	7,  // 0: userservice.UserInfo.created_at:type_name -> google.protobuf.Timestamp
 	7,  // 1: userservice.UserInfo.updated_at:type_name -> google.protobuf.Timestamp
-	0,  // 2: userservice.UserInfo.pro:type_name -> userservice.ProfessionalProfile
-	1,  // 3: userservice.UserInfo.general:type_name -> userservice.GeneralProfile
+	0,  // 2: userservice.UserInfo.professional_profile:type_name -> userservice.ProfessionalProfile
+	1,  // 3: userservice.UserInfo.general_profile:type_name -> userservice.GeneralProfile
 	0,  // 4: userservice.CreateUserRequest.professional:type_name -> userservice.ProfessionalProfile
 	1,  // 5: userservice.CreateUserRequest.general:type_name -> userservice.GeneralProfile
 	2,  // 6: userservice.UpdateUserRequest.data:type_name -> userservice.UserInfo
@@ -637,8 +646,8 @@ func file_userservice_user_proto_init() {
 		return
 	}
 	file_userservice_user_proto_msgTypes[2].OneofWrappers = []any{
-		(*UserInfo_Pro)(nil),
-		(*UserInfo_General)(nil),
+		(*UserInfo_ProfessionalProfile)(nil),
+		(*UserInfo_GeneralProfile)(nil),
 	}
 	file_userservice_user_proto_msgTypes[3].OneofWrappers = []any{
 		(*CreateUserRequest_Professional)(nil),

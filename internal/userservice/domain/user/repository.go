@@ -2,12 +2,6 @@ package user
 
 import (
 	"context"
-	"errors"
-)
-
-var (
-	ErrNotFound          = errors.New("user: not found")
-	ErrEmailAlreadyExists = errors.New("user: email already exists")
 )
 
 type UserRepository interface {

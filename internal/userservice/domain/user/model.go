@@ -9,17 +9,30 @@ const (
 	ProfessionalUser
 )
 
+type Profile interface {
+	IsProfile()
+}
+
+type ProfessionalProfile struct {
+	ProBadgeURL string
+	Biography string
+}
+
+func (p *ProfessionalProfile) IsProfile() {}
+
+type GeneralProfile struct {
+	Points uint32
+	Introduction string
+}
+
+func (g *GeneralProfile) IsProfile() {}
+
+
 type User struct {
 	ID		string
 	Name		string
 	Email		Email
-	Description string
-	Type		UserType
+	Profile Profile
 	CreatedAt	time.Time
 	UpdatedAt	time.Time
-
-	ProBadgeURL string
-	Specialty   string
-
-	Points      uint32
 }

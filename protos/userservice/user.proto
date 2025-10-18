@@ -17,23 +17,24 @@ service UserService {
 
 message ProfessionalProfile {
   string pro_badge_url = 1;
+  string biography = 2;
 }
 
 message GeneralProfile {
   uint32 points = 1;
+  string introduction = 2;
 }
 
 message UserInfo {
   string id = 1;         // UUID v4
   string name = 2;
   string email = 3;
-  string description = 4;
   google.protobuf.Timestamp created_at = 5;
   google.protobuf.Timestamp updated_at = 6;
 
   oneof profile {
-    ProfessionalProfile pro = 7;
-    GeneralProfile general = 8;
+    ProfessionalProfile professional_profile = 7;
+    GeneralProfile general_profile = 8;
   } 
 }
 
