@@ -1,7 +1,6 @@
 package user
 
 import (
-	"errors"
 	"regexp"
 )
 
@@ -13,7 +12,7 @@ var emailRegex = regexp.MustCompile(
 
 func NewEmail(address string) (Email, error) {
 	if !emailRegex.MatchString(address) {
-		return "", errors.New("invalid email format")
+		return "", ErrInvalidEmail
 	}
 	return Email(address), nil
 }

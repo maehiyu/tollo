@@ -9,18 +9,16 @@ import (
 	"github.com/maehiyu/tollo/internal/userservice/domain/user"
 )
 
-
 type CreateUserInput struct {
-	Name        string
-	Email       user.Email
-	Description string
+	Name    string
+	Email   user.Email
+	Profile user.Profile
 }
 
 type UpdateUserInput struct {
-	Name        *string
-	Description *string
+	Name    *string
+	Profile *user.Profile
 }
-
 
 type Usecase interface {
 	CreateUser(ctx context.Context, input *CreateUserInput) (*user.User, error)
@@ -29,7 +27,6 @@ type Usecase interface {
 	UpdateUser(ctx context.Context, id string, input *UpdateUserInput) (*user.User, error)
 	DeleteUser(ctx context.Context, id string) error
 }
-
 
 type usecase struct {
 	userRepo user.UserRepository
@@ -43,22 +40,21 @@ func NewUsecase(userRepo user.UserRepository) Usecase {
 
 func (u *usecase) CreateUser(ctx context.Context, input *CreateUserInput) (*user.User, error) {
 	_, err := u.userRepo.FindByEmail(ctx, input.Email)
-	if err != nil && !errors.Is(err, user.ErrNotFound) { 
+	if err != nil && !errors.Is(err, user.ErrNotFound) {
 		return nil, err
 	}
 	if err == nil {
-		return nil, user.ErrEmailAlreadyExists 
+		return nil, user.ErrEmailAlreadyExists
 	}
 
 	now := time.Now()
 	newUser := &user.User{
-		ID:          uuid.NewString(),
-		Name:        input.Name,
-		Email:       input.Email,
-		Description: input.Description,
-		Type:        user.GeneralUser,
-		CreatedAt:   now,
-		UpdatedAt:   now,
+		ID:        uuid.NewString(),
+		Name:      input.Name,
+		Email:     input.Email,
+		Profile:   input.Profile,
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 
 	if err := u.userRepo.Save(ctx, newUser); err != nil {
@@ -92,8 +88,8 @@ func (u *usecase) UpdateUser(ctx context.Context, id string, input *UpdateUserIn
 	if input.Name != nil {
 		targetUser.Name = *input.Name
 	}
-	if input.Description != nil {
-		targetUser.Description = *input.Description
+	if input.Profile != nil {
+		targetUser.Profile = *input.Profile
 	}
 	targetUser.UpdatedAt = time.Now()
 

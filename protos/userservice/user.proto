@@ -7,6 +7,7 @@ option go_package = "github.com/maehiyu/tollo/protos/userservice";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/empty.proto";
+import "buf/validate/validate.proto";
 
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (UserInfo);
@@ -39,8 +40,14 @@ message UserInfo {
 }
 
 message CreateUserRequest {
-  string name = 1;
-  string email = 2;
+  option (buf.validate.message).cel = {
+    id: "CreateUserRequest.profile.required",
+    message: "profile is required",
+    expression: "has(this.profile)"
+  };
+
+  string name = 1 [(buf.validate.field).string.min_len = 1];
+  string email = 2 [(buf.validate.field).string.email = true];
   string description = 3;
   oneof profile {
     ProfessionalProfile professional = 4;
@@ -50,18 +57,18 @@ message CreateUserRequest {
 
 message GetUserRequest {
   oneof lookup_by {
-    string id = 1;         // UUID v4
-    string email = 2;
+    string id = 1 [(buf.validate.field).string.uuid = true];
+    string email = 2 [(buf.validate.field).string.email = true];
   }
 }
 
 message UpdateUserRequest {
-  string id = 1;
+  string id = 1 [(buf.validate.field).string.uuid = true];
   UserInfo data = 2;
   google.protobuf.FieldMask update_mask = 3;  
 }
 
 message DeleteUserRequest {
-  string id = 1;
+  string id = 1 [(buf.validate.field).string.uuid = true];
 }
 
