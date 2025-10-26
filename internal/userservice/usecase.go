@@ -47,14 +47,14 @@ func (u *usecase) CreateUser(ctx context.Context, input *CreateUserInput) (*user
 		return nil, user.ErrEmailAlreadyExists
 	}
 
-	now := time.Now()
-	newUser := &user.User{
-		ID:        uuid.NewString(),
-		Name:      input.Name,
-		Email:     input.Email,
-		Profile:   input.Profile,
-		CreatedAt: now,
-		UpdatedAt: now,
+	newUser, err := user.NewUser(
+		uuid.NewString(),
+		input.Name,
+		input.Email,
+		input.Profile,
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	if err := u.userRepo.Save(ctx, newUser); err != nil {

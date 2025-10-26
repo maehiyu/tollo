@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"buf.build/go/protovalidate"
 	pb "github.com/maehiyu/tollo/gen/go/protos/userservice"
 	"github.com/maehiyu/tollo/internal/adapter/converter"
 	"github.com/maehiyu/tollo/internal/userservice/domain/user"
@@ -11,6 +12,18 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
+
+var (
+	validator protovalidate.Validator
+)
+
+func init() {
+	var err error
+	validator, err = protovalidate.New()
+	if err != nil {
+		panic(err)
+	}
+}
 
 type Server struct {
 	pb.UnimplementedUserServiceServer
@@ -22,6 +35,9 @@ func NewUserServiceServer(uc Usecase) *Server {
 }
 
 func (s *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.UserInfo, error) {
+	if err := validator.Validate(req); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "validation error: %v", err)
+	}
 	email, err := s.emailFromString(req.GetEmail())
 	if err != nil {
 		return nil, err
@@ -50,15 +66,15 @@ func (s *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb
 }
 
 func (s *Server) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.UserInfo, error) {
+	if err := validator.Validate(req); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "validation error: %v", err)
+	}
 	var foundUser *user.User
 	var err error
 
 	switch v := req.GetLookupBy().(type) {
 	case *pb.GetUserRequest_Id:
 		id := v.Id
-		if id == "" {
-			return nil, status.Errorf(codes.InvalidArgument, "user id is required")
-		}
 		foundUser, err = s.usecase.GetUserByID(ctx, id)
 
 	case *pb.GetUserRequest_Email:
@@ -85,10 +101,10 @@ func (s *Server) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.UserI
 }
 
 func (s *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UserInfo, error) {
-	id := req.GetId()
-	if id == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "user id is required")
+	if err := validator.Validate(req); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "validation error: %v", err)
 	}
+	id := req.GetId()
 	if req.GetData() == nil || req.GetUpdateMask() == nil || len(req.GetUpdateMask().GetPaths()) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "update data and mask are required")
 	}
@@ -118,10 +134,10 @@ func (s *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb
 }
 
 func (s *Server) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*emptypb.Empty, error) {
-	id := req.GetId()
-	if id == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "user id is required")
+	if err := validator.Validate(req); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "validation error: %v", err)
 	}
+	id := req.GetId()
 
 	err := s.usecase.DeleteUser(ctx, id)
 

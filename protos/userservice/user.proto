@@ -47,7 +47,7 @@ message CreateUserRequest {
   };
 
   string name = 1 [(buf.validate.field).string.min_len = 1];
-  string email = 2 [(buf.validate.field).string.email = true];
+  string email = 2 [(buf.validate.field).string.min_len = 1];
   string description = 3;
   oneof profile {
     ProfessionalProfile professional = 4;
@@ -58,7 +58,7 @@ message CreateUserRequest {
 message GetUserRequest {
   oneof lookup_by {
     string id = 1 [(buf.validate.field).string.uuid = true];
-    string email = 2 [(buf.validate.field).string.email = true];
+    string email = 2;
   }
 }
 
