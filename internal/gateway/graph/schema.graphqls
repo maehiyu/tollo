@@ -1,0 +1,91 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+scalar Time
+
+type Query {
+  user(id: ID, email: String): User
+}
+
+type Mutation {
+  sendMessage(input: SendMessageInput!): Message!
+  createUser(input: CreateUserInput!): User!
+}
+
+type ProfessionalProfile {
+  proBadgeUrl: String!
+  biography: String!
+}
+
+type GeneralProfile {
+  points: Int!
+  introduction: String!
+}
+
+union UserProfile = ProfessionalProfile | GeneralProfile
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  description: String
+  professional: ProfessionalProfileInput
+  general: GeneralProfileInput
+}
+
+input ProfessionalProfileInput {
+  proBadgeUrl: String!
+  biography: String!
+}
+
+input GeneralProfileInput {
+  points: Int!
+  introduction: String!
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  createdAt: Time!
+  updatedAt: Time!
+  profile: UserProfile
+}
+
+type Message {
+  id: ID!
+  chatId: ID!
+  senderId: ID!
+  sentAt: Time!
+  # メッセージの内容は後で追加することを検討します
+}
+
+input StandardMessageInput {
+  content: String!
+}
+
+input QuestionMessageInput {
+  content: String!
+  tags: [String!]
+}
+
+input AnswerMessageInput {
+  content: String!
+  questionId: ID!
+}
+
+input PromotionalMessageInput {
+  title: String!
+  body: String!
+  actionUrl: String!
+  imageUrl: String
+}
+
+input SendMessageInput {
+  chatId: ID!
+  senderId: ID!
+  standard: StandardMessageInput
+  question: QuestionMessageInput
+  answer: AnswerMessageInput
+  promotional: PromotionalMessageInput
+}

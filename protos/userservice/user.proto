@@ -43,7 +43,7 @@ message CreateUserRequest {
   option (buf.validate.message).cel = {
     id: "CreateUserRequest.profile.required",
     message: "profile is required",
-    expression: "has(this.profile)"
+    expression: "this.professional != null || this.general != null"
   };
 
   string name = 1 [(buf.validate.field).string.min_len = 1];
