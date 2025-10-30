@@ -37,6 +37,11 @@ type Chat struct {
 	ProfessionalUser   *User     `json:"professionalUser"`
 }
 
+type CreateChatInput struct {
+	GeneralUserID      string `json:"generalUserID"`
+	ProfessionalUserID string `json:"professionalUserID"`
+}
+
 type CreateUserInput struct {
 	Name         string                    `json:"name"`
 	Email        string                    `json:"email"`

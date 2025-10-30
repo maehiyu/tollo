@@ -115,6 +115,21 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 	return r.Resolver.ProtoUserToGraphQLUser(res), nil
 }
 
+// CreateChat is the resolver for the createChat field.
+func (r *mutationResolver) CreateChat(ctx context.Context, input model.CreateChatInput) (*model.Chat, error) {
+	req := &chatpb.CreateChatRequest{
+		GeneralUserId:      input.GeneralUserID,
+		ProfessionalUserId: input.ProfessionalUserID,
+	}
+
+	res, err := r.Resolver.ChatClient.CreateChat(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Resolver.ProtoChatToGraphQLChat(res.Chat), nil
+}
+
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context, id *string, email *string) (*model.User, error) {
 	var userRes *userpb.UserInfo
@@ -185,5 +200,3 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 type chatResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-

@@ -72,6 +72,7 @@ union MessagePayload = StandardMessage | QuestionMessage | AnswerMessage | Promo
 type Mutation {
   sendMessage(input: SendMessageInput!): Message!
   createUser(input: CreateUserInput!): User!
+  createChat(input: CreateChatInput!): Chat!
 }
 
 type User {
@@ -125,10 +126,27 @@ input PromotionalMessageInput {
 }
 
 input SendMessageInput {
+
   chatId: ID!
+
   senderId: ID!
+
   standard: StandardMessageInput
+
   question: QuestionMessageInput
+
   answer: AnswerMessageInput
+
   promotional: PromotionalMessageInput
+
+}
+
+
+
+input CreateChatInput {
+
+  generalUserID: ID!
+
+  professionalUserID: ID!
+
 }

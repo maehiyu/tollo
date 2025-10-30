@@ -79,6 +79,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		CreateChat  func(childComplexity int, input model.CreateChatInput) int
 		CreateUser  func(childComplexity int, input model.CreateUserInput) int
 		SendMessage func(childComplexity int, input model.SendMessageInput) int
 	}
@@ -127,6 +128,7 @@ type ChatResolver interface {
 type MutationResolver interface {
 	SendMessage(ctx context.Context, input model.SendMessageInput) (*model.Message, error)
 	CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error)
+	CreateChat(ctx context.Context, input model.CreateChatInput) (*model.Chat, error)
 }
 type QueryResolver interface {
 	User(ctx context.Context, id *string, email *string) (*model.User, error)
@@ -259,6 +261,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Message.SentAt(childComplexity), true
 
+	case "Mutation.createChat":
+		if e.complexity.Mutation.CreateChat == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createChat_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateChat(childComplexity, args["input"].(model.CreateChatInput)), true
 	case "Mutation.createUser":
 		if e.complexity.Mutation.CreateUser == nil {
 			break
@@ -420,6 +433,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAnswerMessageInput,
+		ec.unmarshalInputCreateChatInput,
 		ec.unmarshalInputCreateUserInput,
 		ec.unmarshalInputGeneralProfileInput,
 		ec.unmarshalInputProfessionalProfileInput,
@@ -542,6 +556,17 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_createChat_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateChatInput2githubᚗcomᚋmaehiyuᚋtolloᚋinternalᚋgatewayᚋgraphᚋmodelᚐCreateChatInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
@@ -1301,6 +1326,65 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createChat(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createChat,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().CreateChat(ctx, fc.Args["input"].(model.CreateChatInput))
+		},
+		nil,
+		ec.marshalNChat2ᚖgithubᚗcomᚋmaehiyuᚋtolloᚋinternalᚋgatewayᚋgraphᚋmodelᚐChat,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createChat(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Chat_id(ctx, field)
+			case "generalUserID":
+				return ec.fieldContext_Chat_generalUserID(ctx, field)
+			case "professionalUserID":
+				return ec.fieldContext_Chat_professionalUserID(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Chat_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Chat_updatedAt(ctx, field)
+			case "latestMessage":
+				return ec.fieldContext_Chat_latestMessage(ctx, field)
+			case "generalUser":
+				return ec.fieldContext_Chat_generalUser(ctx, field)
+			case "professionalUser":
+				return ec.fieldContext_Chat_professionalUser(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Chat", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createChat_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -3497,6 +3581,40 @@ func (ec *executionContext) unmarshalInputAnswerMessageInput(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateChatInput(ctx context.Context, obj any) (model.CreateChatInput, error) {
+	var it model.CreateChatInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"generalUserID", "professionalUserID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "generalUserID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("generalUserID"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.GeneralUserID = data
+		case "professionalUserID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("professionalUserID"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ProfessionalUserID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, obj any) (model.CreateUserInput, error) {
 	var it model.CreateUserInput
 	asMap := map[string]any{}
@@ -4165,6 +4283,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "createUser":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createUser(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createChat":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createChat(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -4892,6 +5017,10 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNChat2githubᚗcomᚋmaehiyuᚋtolloᚋinternalᚋgatewayᚋgraphᚋmodelᚐChat(ctx context.Context, sel ast.SelectionSet, v model.Chat) graphql.Marshaler {
+	return ec._Chat(ctx, sel, &v)
+}
+
 func (ec *executionContext) marshalNChat2ᚕᚖgithubᚗcomᚋmaehiyuᚋtolloᚋinternalᚋgatewayᚋgraphᚋmodelᚐChatᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Chat) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -4944,6 +5073,11 @@ func (ec *executionContext) marshalNChat2ᚖgithubᚗcomᚋmaehiyuᚋtolloᚋint
 		return graphql.Null
 	}
 	return ec._Chat(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNCreateChatInput2githubᚗcomᚋmaehiyuᚋtolloᚋinternalᚋgatewayᚋgraphᚋmodelᚐCreateChatInput(ctx context.Context, v any) (model.CreateChatInput, error) {
+	res, err := ec.unmarshalInputCreateChatInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNCreateUserInput2githubᚗcomᚋmaehiyuᚋtolloᚋinternalᚋgatewayᚋgraphᚋmodelᚐCreateUserInput(ctx context.Context, v any) (model.CreateUserInput, error) {
