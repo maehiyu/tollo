@@ -13,6 +13,24 @@ import (
 	"github.com/maehiyu/tollo/internal/gateway/graph/model"
 )
 
+// GeneralUser is the resolver for the generalUser field.
+func (r *chatResolver) GeneralUser(ctx context.Context, obj *model.Chat) (*model.User, error) {
+	userRes, err := r.Resolver.UserClient.GetUser(ctx, &userpb.GetUserRequest{LookupBy: &userpb.GetUserRequest_Id{Id: obj.GeneralUserID}})
+	if err != nil {
+		return nil, err
+	}
+	return r.Resolver.ProtoUserToGraphQLUser(userRes), nil
+}
+
+// ProfessionalUser is the resolver for the professionalUser field.
+func (r *chatResolver) ProfessionalUser(ctx context.Context, obj *model.Chat) (*model.User, error) {
+	userRes, err := r.Resolver.UserClient.GetUser(ctx, &userpb.GetUserRequest{LookupBy: &userpb.GetUserRequest_Id{Id: obj.ProfessionalUserID}})
+	if err != nil {
+		return nil, err
+	}
+	return r.Resolver.ProtoUserToGraphQLUser(userRes), nil
+}
+
 // SendMessage is the resolver for the sendMessage field.
 func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMessageInput) (*model.Message, error) {
 	req := &chatpb.SendMessageRequest{
@@ -94,29 +112,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 		return nil, err
 	}
 
-	// 3. Convert gRPC response to GraphQL model
-	gqlUser := &model.User{
-		ID:        res.Id,
-		Name:      res.Name,
-		Email:     res.Email,
-		CreatedAt: res.CreatedAt.AsTime(),
-		UpdatedAt: res.UpdatedAt.AsTime(),
-	}
-
-	// Handle the profile oneof from the response
-	if profProfile := res.GetProfessionalProfile(); profProfile != nil {
-		gqlUser.Profile = &model.ProfessionalProfile{
-			ProBadgeURL: profProfile.ProBadgeUrl,
-			Biography:   profProfile.Biography,
-		}
-	} else if genProfile := res.GetGeneralProfile(); genProfile != nil {
-		gqlUser.Profile = &model.GeneralProfile{
-			Points:       int32(genProfile.Points),
-			Introduction: genProfile.Introduction,
-		}
-	}
-
-	return gqlUser, nil
+	return r.Resolver.ProtoUserToGraphQLUser(res), nil
 }
 
 // User is the resolver for the user field.
@@ -136,14 +132,49 @@ func (r *queryResolver) User(ctx context.Context, id *string, email *string) (*m
 		return nil, err
 	}
 
-	return &model.User{
-		ID:        userRes.Id,
-		Name:      userRes.Name,
-		Email:     userRes.Email,
-		CreatedAt: userRes.CreatedAt.AsTime(),
-		UpdatedAt: userRes.UpdatedAt.AsTime(),
-	}, nil
+	return r.Resolver.ProtoUserToGraphQLUser(userRes), nil
 }
+
+// UserChats is the resolver for the userChats field.
+func (r *queryResolver) UserChats(ctx context.Context, userID string) ([]*model.Chat, error) {
+	req := &chatpb.GetUserChatsRequest{
+		UserId: userID,
+	}
+
+	res, err := r.Resolver.ChatClient.GetUserChats(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	gqlChats := make([]*model.Chat, len(res.Chats))
+	for i, protoChat := range res.Chats {
+		gqlChats[i] = r.Resolver.ProtoChatToGraphQLChat(protoChat)
+	}
+
+	return gqlChats, nil
+}
+
+// ChatMessages is the resolver for the chatMessages field.
+func (r *queryResolver) ChatMessages(ctx context.Context, chatID string) ([]*model.Message, error) {
+	req := &chatpb.GetChatMessagesRequest{
+		ChatId: chatID,
+	}
+
+	res, err := r.Resolver.ChatClient.GetChatMessages(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	gqlMessages := make([]*model.Message, len(res.Messages))
+	for i, protoMsg := range res.Messages {
+		gqlMessages[i] = r.Resolver.ProtoMessageToGraphQLMessage(protoMsg)
+	}
+
+	return gqlMessages, nil
+}
+
+// Chat returns ChatResolver implementation.
+func (r *Resolver) Chat() ChatResolver { return &chatResolver{r} }
 
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
@@ -151,5 +182,8 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+type chatResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+

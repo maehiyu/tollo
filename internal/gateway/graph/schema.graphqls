@@ -6,13 +6,11 @@ scalar Time
 
 type Query {
   user(id: ID, email: String): User
+  userChats(userID: ID!): [Chat!]! # New query for chat list
+  chatMessages(chatID: ID!): [Message!]! # New query for messages of a specific chat
 }
 
-type Mutation {
-  sendMessage(input: SendMessageInput!): Message!
-  createUser(input: CreateUserInput!): User!
-}
-
+# Profile types
 type ProfessionalProfile {
   proBadgeUrl: String!
   biography: String!
@@ -23,8 +21,10 @@ type GeneralProfile {
   introduction: String!
 }
 
+# Profile union
 union UserProfile = ProfessionalProfile | GeneralProfile
 
+# Input for the createUser mutation
 input CreateUserInput {
   name: String!
   email: String!
@@ -33,6 +33,7 @@ input CreateUserInput {
   general: GeneralProfileInput
 }
 
+# Profile input types
 input ProfessionalProfileInput {
   proBadgeUrl: String!
   biography: String!
@@ -41,6 +42,36 @@ input ProfessionalProfileInput {
 input GeneralProfileInput {
   points: Int!
   introduction: String!
+}
+
+# Message payload types
+type StandardMessage {
+  content: String!
+}
+
+type QuestionMessage {
+  content: String!
+  tags: [String!]
+}
+
+type AnswerMessage {
+  content: String!
+  questionId: ID!
+}
+
+type PromotionalMessage {
+  title: String!
+  body: String!
+  actionUrl: String!
+  imageUrl: String
+}
+
+# Message payload union
+union MessagePayload = StandardMessage | QuestionMessage | AnswerMessage | PromotionalMessage
+
+type Mutation {
+  sendMessage(input: SendMessageInput!): Message!
+  createUser(input: CreateUserInput!): User!
 }
 
 type User {
@@ -57,7 +88,19 @@ type Message {
   chatId: ID!
   senderId: ID!
   sentAt: Time!
-  # メッセージの内容は後で追加することを検討します
+  payload: MessagePayload # Add message payload
+}
+
+# New Chat type - now includes latestMessage and specific user fields
+type Chat {
+  id: ID!
+  generalUserID: ID!
+  professionalUserID: ID!
+  createdAt: Time!
+  updatedAt: Time!
+  latestMessage: Message
+  generalUser: User! # New field resolver for general user
+  professionalUser: User! # New field resolver for professional user
 }
 
 input StandardMessageInput {
@@ -66,7 +109,7 @@ input StandardMessageInput {
 
 input QuestionMessageInput {
   content: String!
-  tags: [String!]
+  tags: [String!] 
 }
 
 input AnswerMessageInput {

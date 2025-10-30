@@ -18,12 +18,12 @@ func NewUsecase(chatRepo chat.ChatRepository) *Usecase {
 	}
 }
 
-func (u *Usecase) SendMessage(ctx context.Context, chatID, senderID string, content chat.MessageContent) (*chat.Message, error) {
+func (u *Usecase) SendMessage(ctx context.Context, chatID, senderID string, payload chat.MessagePayload) (*chat.Message, error) {
 	msg := &chat.Message{
 		ID:       uuid.NewString(),
 		ChatID:   chatID,
 		SenderID: senderID,
-		Content:  content,
+		Payload:  payload,
 		SentAt:   time.Now(),
 	}
 
@@ -32,4 +32,12 @@ func (u *Usecase) SendMessage(ctx context.Context, chatID, senderID string, cont
 	}
 
 	return msg, nil
+}
+
+func (u *Usecase) GetChatsByUserID(ctx context.Context, userID string) ([]*chat.Chat, error) {
+	return u.chatRepo.GetChatsByUserID(ctx, userID)
+}
+
+func (u *Usecase) GetMessagesByChatID(ctx context.Context, chatID string) ([]*chat.Message, error) {
+	return u.chatRepo.GetMessagesByChatID(ctx, chatID)
 }

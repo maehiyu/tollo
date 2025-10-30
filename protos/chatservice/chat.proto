@@ -9,6 +9,8 @@ import "buf/validate/validate.proto";
 
 service ChatService {
   rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+  rpc GetUserChats(GetUserChatsRequest) returns (GetUserChatsResponse);
+  rpc GetChatMessages(GetChatMessagesRequest) returns (GetChatMessagesResponse); // New RPC
 }
 
 message StandardMessage {
@@ -38,6 +40,7 @@ message Chat {
   string professional_user_id = 3;
   google.protobuf.Timestamp created_at = 4;
   google.protobuf.Timestamp updated_at = 5;
+  optional Message latest_message = 6;
 }
 
 message Message {
@@ -70,4 +73,20 @@ message SendMessageRequest {
 
 message SendMessageResponse {
   Message sent_message = 1;
+}
+
+message GetUserChatsRequest {
+  string user_id = 1 [(buf.validate.field).string.uuid = true];
+}
+
+message GetUserChatsResponse {
+  repeated Chat chats = 1;
+}
+
+message GetChatMessagesRequest {
+  string chat_id = 1 [(buf.validate.field).string.uuid = true];
+}
+
+message GetChatMessagesResponse {
+  repeated Message messages = 1;
 }

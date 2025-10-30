@@ -41,28 +41,32 @@ func ToUserInfo(u *user.User) *userpb.UserInfo {
 	return userInfo
 }
 
-func StandardMessageProtoToDomain(p *chatpb.StandardMessage) *chat.StandardContent {
-	return &chat.StandardContent{
+// Renamed from StandardMessageProtoToDomain
+func StandardPayloadProtoToDomain(p *chatpb.StandardMessage) chat.MessagePayload {
+	return &chat.StandardMessage{
 		Content: p.GetContent(),
 	}
 }
 
-func QuestionMessageProtoToDomain(p *chatpb.QuestionMessage) *chat.QuestionContent {
-	return &chat.QuestionContent{
+// Renamed from QuestionMessageProtoToDomain
+func QuestionPayloadProtoToDomain(p *chatpb.QuestionMessage) chat.MessagePayload {
+	return &chat.QuestionMessage{
 		Content: p.GetContent(),
 		Tags:    p.GetTags(),
 	}
 }
 
-func AnswerMessageProtoToDomain(p *chatpb.AnswerMessage) *chat.AnswerContent {
-	return &chat.AnswerContent{
+// Renamed from AnswerMessageProtoToDomain
+func AnswerPayloadProtoToDomain(p *chatpb.AnswerMessage) chat.MessagePayload {
+	return &chat.AnswerMessage{
 		Content:    p.GetContent(),
 		QuestionID: p.GetQuestionId(),
 	}
 }
 
-func PromotionalMessageProtoToDomain(p *chatpb.PromotionalMessage) *chat.PromotionalContent {
-	return &chat.PromotionalContent{
+// Renamed from PromotionalMessageProtoToDomain
+func PromotionalPayloadProtoToDomain(p *chatpb.PromotionalMessage) chat.MessagePayload {
+	return &chat.PromotionalMessage{
 		Title:     p.GetTitle(),
 		Body:      p.GetBody(),
 		ActionURL: p.GetActionUrl(),
@@ -78,20 +82,21 @@ func MessageDomainToProto(m *chat.Message) *chatpb.Message {
 		SentAt:   timestamppb.New(m.SentAt),
 	}
 
-	switch c := m.Content.(type) {
-	case *chat.StandardContent:
+	// Changed m.Content to m.Payload
+	switch c := m.Payload.(type) {
+	case *chat.StandardMessage: // Changed chat.StandardContent to chat.StandardMessage
 		p.MessagePayload = &chatpb.Message_Standard{
 			Standard: &chatpb.StandardMessage{Content: c.Content},
 		}
-	case *chat.QuestionContent:
+	case *chat.QuestionMessage: // Changed chat.QuestionContent to chat.QuestionMessage
 		p.MessagePayload = &chatpb.Message_Question{
 			Question: &chatpb.QuestionMessage{Content: c.Content, Tags: c.Tags},
 		}
-	case *chat.AnswerContent:
+	case *chat.AnswerMessage: // Changed chat.AnswerContent to chat.AnswerMessage
 		p.MessagePayload = &chatpb.Message_Answer{
 			Answer: &chatpb.AnswerMessage{Content: c.Content, QuestionId: c.QuestionID},
 		}
-	case *chat.PromotionalContent:
+	case *chat.PromotionalMessage: // Changed chat.PromotionalContent to chat.PromotionalMessage
 		p.MessagePayload = &chatpb.Message_Promotional{
 			Promotional: &chatpb.PromotionalMessage{
 				Title:     c.Title,
@@ -103,4 +108,24 @@ func MessageDomainToProto(m *chat.Message) *chatpb.Message {
 	}
 
 	return p
+}
+
+func ChatDomainToProto(c *chat.Chat) *chatpb.Chat {
+	if c == nil {
+		return nil
+	}
+
+	protoChat := &chatpb.Chat{
+		Id:                 c.ID,
+		GeneralUserId:      c.GeneralUserID,
+		ProfessionalUserId: c.ProfessionalUserID,
+		CreatedAt:          timestamppb.New(c.CreatedAt),
+		UpdatedAt:          timestamppb.New(c.UpdatedAt),
+	}
+
+	if c.LatestMessage != nil {
+		protoChat.LatestMessage = MessageDomainToProto(c.LatestMessage)
+	}
+
+	return protoChat
 }

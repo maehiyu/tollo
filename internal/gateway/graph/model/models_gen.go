@@ -6,13 +6,35 @@ import (
 	"time"
 )
 
+type MessagePayload interface {
+	IsMessagePayload()
+}
+
 type UserProfile interface {
 	IsUserProfile()
 }
 
+type AnswerMessage struct {
+	Content    string `json:"content"`
+	QuestionID string `json:"questionId"`
+}
+
+func (AnswerMessage) IsMessagePayload() {}
+
 type AnswerMessageInput struct {
 	Content    string `json:"content"`
 	QuestionID string `json:"questionId"`
+}
+
+type Chat struct {
+	ID                 string    `json:"id"`
+	GeneralUserID      string    `json:"generalUserID"`
+	ProfessionalUserID string    `json:"professionalUserID"`
+	CreatedAt          time.Time `json:"createdAt"`
+	UpdatedAt          time.Time `json:"updatedAt"`
+	LatestMessage      *Message  `json:"latestMessage,omitempty"`
+	GeneralUser        *User     `json:"generalUser"`
+	ProfessionalUser   *User     `json:"professionalUser"`
 }
 
 type CreateUserInput struct {
@@ -36,10 +58,11 @@ type GeneralProfileInput struct {
 }
 
 type Message struct {
-	ID       string    `json:"id"`
-	ChatID   string    `json:"chatId"`
-	SenderID string    `json:"senderId"`
-	SentAt   time.Time `json:"sentAt"`
+	ID       string         `json:"id"`
+	ChatID   string         `json:"chatId"`
+	SenderID string         `json:"senderId"`
+	SentAt   time.Time      `json:"sentAt"`
+	Payload  MessagePayload `json:"payload,omitempty"`
 }
 
 type Mutation struct {
@@ -57,6 +80,15 @@ type ProfessionalProfileInput struct {
 	Biography   string `json:"biography"`
 }
 
+type PromotionalMessage struct {
+	Title     string  `json:"title"`
+	Body      string  `json:"body"`
+	ActionURL string  `json:"actionUrl"`
+	ImageURL  *string `json:"imageUrl,omitempty"`
+}
+
+func (PromotionalMessage) IsMessagePayload() {}
+
 type PromotionalMessageInput struct {
 	Title     string  `json:"title"`
 	Body      string  `json:"body"`
@@ -66,6 +98,13 @@ type PromotionalMessageInput struct {
 
 type Query struct {
 }
+
+type QuestionMessage struct {
+	Content string   `json:"content"`
+	Tags    []string `json:"tags,omitempty"`
+}
+
+func (QuestionMessage) IsMessagePayload() {}
 
 type QuestionMessageInput struct {
 	Content string   `json:"content"`
@@ -80,6 +119,12 @@ type SendMessageInput struct {
 	Answer      *AnswerMessageInput      `json:"answer,omitempty"`
 	Promotional *PromotionalMessageInput `json:"promotional,omitempty"`
 }
+
+type StandardMessage struct {
+	Content string `json:"content"`
+}
+
+func (StandardMessage) IsMessagePayload() {}
 
 type StandardMessageInput struct {
 	Content string `json:"content"`

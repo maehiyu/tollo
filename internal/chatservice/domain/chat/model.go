@@ -2,38 +2,38 @@ package chat
 
 import "time"
 
-type MessageContent interface {
-	isMessageContent()
+type MessagePayload interface {
+	isMessagePayload()
 }
 
-type StandardContent struct {
+type StandardMessage struct {
 	Content string
 }
 
-func (c *StandardContent) isMessageContent() {}
+func (c *StandardMessage) isMessagePayload() {}
 
-type QuestionContent struct {
+type QuestionMessage struct {
 	Content string
 	Tags    []string
 }
 
-func (c *QuestionContent) isMessageContent() {}
+func (c *QuestionMessage) isMessagePayload() {}
 
-type AnswerContent struct {
+type AnswerMessage struct {
 	Content    string
 	QuestionID string
 }
 
-func (c *AnswerContent) isMessageContent() {}
+func (c *AnswerMessage) isMessagePayload() {}
 
-type PromotionalContent struct {
+type PromotionalMessage struct {
 	Title     string
 	Body      string
 	ActionURL string
 	ImageURL  string
 }
 
-func (c *PromotionalContent) isMessageContent() {}
+func (c *PromotionalMessage) isMessagePayload() {}
 
 type Chat struct {
 	ID                 string
@@ -41,12 +41,13 @@ type Chat struct {
 	ProfessionalUserID string
 	CreatedAt          time.Time
 	UpdatedAt          time.Time
+	LatestMessage      *Message
 }
 
 type Message struct {
 	ID       string
 	ChatID   string
 	SenderID string
-	Content  MessageContent
+	Payload  MessagePayload
 	SentAt   time.Time
 }
