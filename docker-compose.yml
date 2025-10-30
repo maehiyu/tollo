@@ -1,29 +1,37 @@
 services:
   userservice:
-    build: 
-      context: ./userservice
+    build:
+      context: .
       dockerfile: build/docker/userservice.dockerfile
     ports:
       - "50051:50051"
-    environment:
-      DATABASE_URL: postgres://user:password@db:5432/users_db?sslmode=disable
-    depends_on:
-      - user_db
     networks:
       - app-networks
-  user_db:
-    image: postgres:15
+
+  chatservice:
+    build:
+      context: .
+      dockerfile: build/docker/chatservice.dockerfile
+    ports:
+      - "50052:50052"
+    networks:
+      - app-networks
+
+  gateway:
+    build:
+      context: .
+      dockerfile: build/docker/gateway.dockerfile
+    ports:
+      - "8080:8080"
     environment:
-      POSTGRES_DB: users_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-    volumes:
-      - user_db_data:/var/lib/postgresql/data
+      USER_SERVICE_ADDR: userservice:50051
+      CHAT_SERVICE_ADDR: chatservice:50052
+    depends_on:
+      - userservice
+      - chatservice
     networks:
       - app-networks
 
 networks:
   app-networks:
     driver: bridge
-volumes:
-  user_db_data:

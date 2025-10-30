@@ -1,3 +1,3 @@
 package protos
 
-//go:generate buf generate
+//go:generate buf generate --template ../buf.gen.yaml .

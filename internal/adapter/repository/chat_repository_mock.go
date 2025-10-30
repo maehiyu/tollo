@@ -37,7 +37,7 @@ func NewChatRepositoryMock() *ChatRepositoryMock {
 			ChatID:   chat1ID,
 			SenderID: "user1-uuid",
 			SentAt:   time.Now().Add(-30 * time.Minute),
-			Payload: &chat.StandardMessage{Content: "Hello World from chat1"},
+			Payload:  &chat.StandardMessage{Content: "Hello World from chat1"},
 		},
 	}
 
@@ -48,11 +48,11 @@ func NewChatRepositoryMock() *ChatRepositoryMock {
 		CreatedAt:          time.Now().Add(-1 * time.Hour),
 		UpdatedAt:          time.Now().Add(-30 * time.Minute),
 		LatestMessage: &chat.Message{
-			ID:      uuid.New().String(),
-			ChatID:  chat2ID,
+			ID:       uuid.New().String(),
+			ChatID:   chat2ID,
 			SenderID: "user3-uuid",
-			SentAt:  time.Now().Add(-5 * time.Minute),
-			Payload: &chat.QuestionMessage{Content: "How are you?", Tags: []string{"greeting"}},
+			SentAt:   time.Now().Add(-5 * time.Minute),
+			Payload:  &chat.QuestionMessage{Content: "How are you?", Tags: []string{"greeting"}},
 		},
 	}
 
@@ -64,6 +64,14 @@ func (m *ChatRepositoryMock) SaveMessage(ctx context.Context, message *chat.Mess
 	defer m.mu.Unlock()
 
 	m.messages[message.ChatID] = append(m.messages[message.ChatID], message)
+	return nil
+}
+
+func (m *ChatRepositoryMock) Create(ctx context.Context, newChat *chat.Chat) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	m.chats[newChat.ID] = newChat
 	return nil
 }
 

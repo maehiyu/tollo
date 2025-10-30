@@ -11,6 +11,7 @@ service ChatService {
   rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
   rpc GetUserChats(GetUserChatsRequest) returns (GetUserChatsResponse);
   rpc GetChatMessages(GetChatMessagesRequest) returns (GetChatMessagesResponse); // New RPC
+  rpc CreateChat(CreateChatRequest) returns (CreateChatResponse); // New RPC
 }
 
 message StandardMessage {
@@ -89,4 +90,13 @@ message GetChatMessagesRequest {
 
 message GetChatMessagesResponse {
   repeated Message messages = 1;
+}
+
+message CreateChatRequest {
+  string general_user_id = 1 [(buf.validate.field).string.uuid = true];
+  string professional_user_id = 2 [(buf.validate.field).string.uuid = true];
+}
+
+message CreateChatResponse {
+  Chat chat = 1;
 }

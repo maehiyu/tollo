@@ -41,3 +41,18 @@ func (u *Usecase) GetChatsByUserID(ctx context.Context, userID string) ([]*chat.
 func (u *Usecase) GetMessagesByChatID(ctx context.Context, chatID string) ([]*chat.Message, error) {
 	return u.chatRepo.GetMessagesByChatID(ctx, chatID)
 }
+
+func (u *Usecase) CreateChat(ctx context.Context, generalUserID, professionalUserID string) (*chat.Chat, error) {
+	newChat := &chat.Chat{
+		ID:                 uuid.NewString(),
+		GeneralUserID:      generalUserID,
+		ProfessionalUserID: professionalUserID,
+		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
+	}
+	// The mock repository's Create method will add this to its internal map
+	if err := u.chatRepo.Create(ctx, newChat); err != nil {
+		return nil, err
+	}
+	return newChat, nil
+}

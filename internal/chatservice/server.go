@@ -80,3 +80,17 @@ func (s *Server) GetChatMessages(ctx context.Context, req *pb.GetChatMessagesReq
 		Messages: protoMessages,
 	}, nil
 }
+
+func (s *Server) CreateChat(ctx context.Context, req *pb.CreateChatRequest) (*pb.CreateChatResponse, error) {
+	generalUserID := req.GetGeneralUserId()
+	professionalUserID := req.GetProfessionalUserId()
+
+	domainChat, err := s.usecase.CreateChat(ctx, generalUserID, professionalUserID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.CreateChatResponse{
+		Chat: converter.ChatDomainToProto(domainChat),
+	}, nil
+}
