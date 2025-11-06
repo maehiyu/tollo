@@ -1,0 +1,152 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+scalar Time
+
+type Query {
+  user(id: ID, email: String): User
+  userChats(userID: ID!): [Chat!]! # New query for chat list
+  chatMessages(chatID: ID!): [Message!]! # New query for messages of a specific chat
+}
+
+# Profile types
+type ProfessionalProfile {
+  proBadgeUrl: String!
+  biography: String!
+}
+
+type GeneralProfile {
+  points: Int!
+  introduction: String!
+}
+
+# Profile union
+union UserProfile = ProfessionalProfile | GeneralProfile
+
+# Input for the createUser mutation
+input CreateUserInput {
+  name: String!
+  email: String!
+  description: String
+  professional: ProfessionalProfileInput
+  general: GeneralProfileInput
+}
+
+# Profile input types
+input ProfessionalProfileInput {
+  proBadgeUrl: String!
+  biography: String!
+}
+
+input GeneralProfileInput {
+  points: Int!
+  introduction: String!
+}
+
+# Message payload types
+type StandardMessage {
+  content: String!
+}
+
+type QuestionMessage {
+  content: String!
+  tags: [String!]
+}
+
+type AnswerMessage {
+  content: String!
+  questionId: ID!
+}
+
+type PromotionalMessage {
+  title: String!
+  body: String!
+  actionUrl: String!
+  imageUrl: String
+}
+
+# Message payload union
+union MessagePayload = StandardMessage | QuestionMessage | AnswerMessage | PromotionalMessage
+
+type Mutation {
+  sendMessage(input: SendMessageInput!): Message!
+  createUser(input: CreateUserInput!): User!
+  createChat(input: CreateChatInput!): Chat!
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  createdAt: Time!
+  updatedAt: Time!
+  profile: UserProfile
+}
+
+type Message {
+  id: ID!
+  chatId: ID!
+  senderId: ID!
+  sentAt: Time!
+  payload: MessagePayload # Add message payload
+}
+
+# New Chat type - now includes latestMessage and specific user fields
+type Chat {
+  id: ID!
+  generalUserID: ID!
+  professionalUserID: ID!
+  createdAt: Time!
+  updatedAt: Time!
+  latestMessage: Message
+  generalUser: User! # New field resolver for general user
+  professionalUser: User! # New field resolver for professional user
+}
+
+input StandardMessageInput {
+  content: String!
+}
+
+input QuestionMessageInput {
+  content: String!
+  tags: [String!] 
+}
+
+input AnswerMessageInput {
+  content: String!
+  questionId: ID!
+}
+
+input PromotionalMessageInput {
+  title: String!
+  body: String!
+  actionUrl: String!
+  imageUrl: String
+}
+
+input SendMessageInput {
+
+  chatId: ID!
+
+  senderId: ID!
+
+  standard: StandardMessageInput
+
+  question: QuestionMessageInput
+
+  answer: AnswerMessageInput
+
+  promotional: PromotionalMessageInput
+
+}
+
+
+
+input CreateChatInput {
+
+  generalUserID: ID!
+
+  professionalUserID: ID!
+
+}
