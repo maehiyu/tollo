@@ -8,7 +8,7 @@ pluginManagement {
 
 // 依存ライブラリを探す場所を定義します
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
     repositories {
         google()
         mavenCentral() // <- これでkotlin-scripting-compilerが見つかるようになります

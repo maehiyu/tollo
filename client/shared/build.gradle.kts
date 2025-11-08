@@ -1,11 +1,21 @@
 plugins {
   id("com.apollographql.apollo") version "4.3.3"
-  kotlin("multiplatform") version "1.9.22"
+  kotlin("multiplatform") version "2.2.21"
 }
 
 kotlin {
   // A target is required by the Kotlin Multiplatform plugin
   jvm() 
+  js {
+    browser {
+      webpackTask {
+        outputDirectory.set(file("${buildDir}/js"))
+        mainOutputFileName.set("bundle.js")
+      }   
+    }
+    binaries.executable()
+
+  }
 
   sourceSets {
     commonMain.dependencies {
