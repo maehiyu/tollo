@@ -12,7 +12,7 @@
   "dependencies": {
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "shared": "file:../../build/js/packages/tollo-client-shared"
+    "shared": "file:../build/js/packages/client-shared"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
