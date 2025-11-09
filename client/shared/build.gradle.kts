@@ -6,14 +6,11 @@ plugins {
 kotlin {
   // A target is required by the Kotlin Multiplatform plugin
   jvm() 
-  js {
+  js(IR) {
+    useEsModules() // Add this line
     browser {
-      webpackTask {
-        outputDirectory.set(file("${buildDir}/js"))
-        mainOutputFileName.set("bundle.js")
-      }   
+      binaries.library()
     }
-    binaries.executable()
 
   }
 
@@ -25,7 +22,7 @@ kotlin {
 }
 
 apollo {
-  service("tollo") {
+  service("api") {
     packageName.set("io.github.maehiyu.tollo.client.shared")
     schemaFiles.from(file("src/commonMain/graphql/schema.graphqls"))
     srcDir("src/commonMain/graphql")
