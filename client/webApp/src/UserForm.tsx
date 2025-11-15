@@ -75,9 +75,10 @@ function UserForm() {
       } else {
         setError('Failed to create user. The server returned no user data.');
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error('[React] Error creating user:', e);
-      setError(e.message || 'An unknown error occurred.');
+      const message = e instanceof Error ? e.message: 'An unknown error occurred.';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -97,9 +98,10 @@ function UserForm() {
       } else {
         setSearchError('User not found with this email.');
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error('[React] Error searching user:', e);
-      setSearchError(e.message || 'An unknown error occurred during search.');
+      const message = e instanceof Error ? e.message: 'An unknown error occurred.';
+      setSearchError(message);
     } finally {
       setSearchLoading(false);
     }
