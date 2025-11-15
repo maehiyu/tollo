@@ -53,3 +53,6 @@ coverage/
 # Kotlin
 *.jar
 *.war
+*.klib
+.kotlin/
+kls_database.db

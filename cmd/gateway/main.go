@@ -13,6 +13,7 @@ import (
 	chatpb "github.com/maehiyu/tollo/gen/go/protos/chatservice"
 	userpb "github.com/maehiyu/tollo/gen/go/protos/userservice"
 	"github.com/maehiyu/tollo/internal/gateway/graph"
+	"github.com/rs/cors"
 )
 
 const defaultPort = "8080"
@@ -24,7 +25,11 @@ func main() {
 	}
 
 	// Connect to UserService
-	userConn, err := grpc.Dial("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	userServiceAddr := os.Getenv("USER_SERVICE_ADDR")
+	if userServiceAddr == "" {
+		userServiceAddr = "localhost:50051"
+	}
+	userConn, err := grpc.NewClient(userServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect to user service: %v", err)
 	}
@@ -32,7 +37,11 @@ func main() {
 	userClient := userpb.NewUserServiceClient(userConn)
 
 	// Connect to ChatService
-	chatConn, err := grpc.Dial("localhost:50052", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	chatServiceAddr := os.Getenv("CHAT_SERVICE_ADDR")
+	if chatServiceAddr == "" {
+		chatServiceAddr = "localhost:50052"
+	}
+	chatConn, err := grpc.NewClient(chatServiceAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("did not connect to chat service: %v", err)
 	}
@@ -46,9 +55,18 @@ func main() {
 		},
 	}))
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	mux := http.NewServeMux()
+	mux.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	mux.Handle("/query", srv)
+
+	handler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:5173"},
+		AllowCredentials: true,
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+		Debug:            true,
+	}).Handler(mux)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, handler))
 }

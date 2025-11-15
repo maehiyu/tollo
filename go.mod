@@ -7,6 +7,7 @@ require (
 	buf.build/go/protovalidate v1.0.0
 	github.com/99designs/gqlgen v0.17.81
 	github.com/google/uuid v1.6.0
+	github.com/rs/cors v1.11.1
 	github.com/vektah/gqlparser/v2 v2.5.30
 	google.golang.org/grpc v1.76.0
 	google.golang.org/protobuf v1.36.10

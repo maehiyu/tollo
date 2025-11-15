@@ -2,6 +2,7 @@
 
 ## プロジェクト概要
 本プロジェクトは、Q&Aプラットフォームをマイクロサービスアーキテクチャで構築しています。
+クライアントサイドではKotlin Multiplatform (KMP) を採用し、サービス定義にはApollo Kotlinを使用しています。共通ロジックはcommonMainで、プラットフォーム固有の実装はjsMainで管理されます。
 
 ## ドキュメント
 - **要求仕様**: [docs/01_requirement.md](docs/01_requirement.md)
