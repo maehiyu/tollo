@@ -18,9 +18,34 @@ import kotlin.js.JsExport
 import kotlin.js.JsName
 
 import io.github.maehiyu.tollo.client.shared.data.auth.DevAuthContext
+import io.github.maehiyu.tollo.client.shared.domain.service.AuthService
 
+// DI Container: 依存を解決
 private val apolloClient = createApolloClient(DevAuthContext)
 private val userRepository: UserRepository = UserRepositoryImpl(apolloClient)
+private val authServiceInstance: AuthService = AuthService(DevAuthContext)
+private val userServiceInstance: UserService = UserService(userRepository)
+
+// AuthService wrapper functions
+@JsExport
+fun login(email: String, password: String) {
+    authServiceInstance.login(email, password)
+}
+
+@JsExport
+fun logout() {
+    authServiceInstance.logout()
+}
+
+@JsExport
+fun isLoggedIn(): Boolean {
+    return authServiceInstance.isLoggedIn()
+}
+
+@JsExport
+fun getCurrentUserId(): String? {
+    return authServiceInstance.getCurrentUserId()
+}
 
 @JsExport
 data class JsGeneralProfile(
@@ -43,12 +68,9 @@ data class JsUser(
 )
 
 @JsExport
-val userService: UserService = UserService(userRepository)
-
-@JsExport
 fun getUser(id: String): Promise<JsUser?> =
     CoroutineScope(Dispatchers.Unconfined).promise {
-        userService.getUser(id = id, email = null)?.let { user ->
+        userServiceInstance.getUser(id = id, email = null)?.let { user ->
             JsUser(user.id, user.name, user.email, user.createdAt.toString())
         }
     }
@@ -56,7 +78,7 @@ fun getUser(id: String): Promise<JsUser?> =
 @JsExport
 fun getUserByEmail(email: String): Promise<JsUser?> =
     CoroutineScope(Dispatchers.Unconfined).promise {
-        userService.getUser(id = null, email = email)?.let { user ->
+        userServiceInstance.getUser(id = null, email = email)?.let { user ->
             JsUser(user.id, user.name, user.email, user.createdAt.toString())
         }
     }
@@ -76,7 +98,7 @@ fun createUser(
       val professionalInput = professionalProfile?.let {
         ProfessionalProfileInput(it.proBadgeUrl, it.biography)
       }
-      userService.createUser(name, email, description, generalInput, professionalInput)?.let { user ->
+      userServiceInstance.createUser(name, email, description, generalInput, professionalInput)?.let { user ->
           JsUser(user.id, user.name, user.email, user.createdAt.toString())
       }
     }
