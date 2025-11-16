@@ -1,0 +1,19 @@
+query GetUser($id: ID, $email: String) {
+  user(id: $id, email: $email) {
+    id
+    name
+    email
+    createdAt
+    updatedAt
+    profile {
+      ... on ProfessionalProfile {
+        proBadgeUrl
+        biography
+      }
+      ... on GeneralProfile {
+        points
+        introduction
+      }
+    }
+  }
+}

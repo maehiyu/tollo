@@ -1,0 +1,33 @@
+mutation CreateUser(
+  $name: String!
+  $email: String!
+  $description: String
+  $general: GeneralProfileInput
+  $professional: ProfessionalProfileInput
+) {
+  createUser(
+    input: {
+      name: $name
+      email: $email
+      description: $description
+      general: $general
+      professional: $professional
+    }
+  ) {
+    id
+    name
+    email
+    createdAt
+    profile {
+      __typename
+      ... on ProfessionalProfile {
+        proBadgeUrl
+        biography
+      }
+      ... on GeneralProfile {
+        points
+        introduction
+      }
+    }
+  }
+}

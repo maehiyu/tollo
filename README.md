@@ -2,6 +2,7 @@
 
 ## プロジェクト概要
 本プロジェクトは、Q&Aプラットフォームをマイクロサービスアーキテクチャで構築しています。
+クライアントサイドではKotlin Multiplatform (KMP) を採用し、サービス定義にはApollo Kotlinを使用しています。共通ロジックはcommonMainで、プラットフォーム固有の実装はjsMainで管理されます。
 
 ## ドキュメント
 - **要求仕様**: [docs/01_requirement.md](docs/01_requirement.md)
@@ -21,6 +22,27 @@ buf generate
 ```
 
 このコマンドにより、`buf.gen.yaml`の設定に従って`gen/go`ディレクトリにコードが生成されます。
+
+## ビルドとテスト
+本プロジェクトのクライアントサイドはGradleで管理されています。
+
+### ビルド
+すべてのサブプロジェクトをビルドします。
+```bash
+./gradlew build
+```
+
+### クリーン
+ビルドディレクトリを削除します。
+```bash
+./gradlew clean
+```
+
+### テストとチェック
+`client:shared`モジュールのテストと静的解析を実行します。
+```bash
+./gradlew :client:shared:check
+```
 
 ## 補足
 - 現時点では、`go install`で直接インストールする実行可能バイナリは提供されていません。

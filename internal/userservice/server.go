@@ -59,6 +59,9 @@ func (s *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb
 		if errors.Is(err, user.ErrEmailAlreadyExists) {
 			return nil, status.Errorf(codes.AlreadyExists, err.Error())
 		}
+		if errors.Is(err, user.ErrEmptyID) || errors.Is(err, user.ErrEmptyName) || errors.Is(err, user.ErrNilProfile) {
+			return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		}
 		return nil, status.Errorf(codes.Internal, "failed to create user: %v", err)
 	}
 
