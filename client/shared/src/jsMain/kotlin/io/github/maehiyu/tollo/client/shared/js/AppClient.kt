@@ -17,7 +17,9 @@ import kotlin.js.Promise
 import kotlin.js.JsExport
 import kotlin.js.JsName
 
-private val apolloClient = createApolloClient()
+import io.github.maehiyu.tollo.client.shared.data.auth.DevAuthContext
+
+private val apolloClient = createApolloClient(DevAuthContext)
 private val userRepository: UserRepository = UserRepositoryImpl(apolloClient)
 
 @JsExport

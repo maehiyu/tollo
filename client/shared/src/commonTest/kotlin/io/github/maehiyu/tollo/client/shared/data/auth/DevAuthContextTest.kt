@@ -1,39 +1,40 @@
-package io.github.maehiyu.tollo.client.shared.domain.auth
+package io.github.maehiyu.tollo.client.shared.data.auth
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.BeforeTest
 import kotlin.test.assertNull
 
-class AuthContextTest {
+class DevAuthContextTest {
     @BeforeTest
     fun setUp() {
-        AuthContext.clearUserId()
+        DevAuthContext.clearUserId()
     }
+
     @Test
     fun testSetAndGetUserId() {
         // Given
         val userId = "user-123"
 
         // When
-        AuthContext.setUserId(userId)
+        DevAuthContext.setUserId(userId)
 
         // Then
-        assertEquals(userId, AuthContext.getUserId())
+        assertEquals(userId, DevAuthContext.getUserId())
     }
 
     @Test
     fun testClearUserId() {
         val userId = "user-123"
 
-        AuthContext.setUserId(userId)
-        AuthContext.clearUserId()
-        assertEquals(null, AuthContext.getUserId())
+        DevAuthContext.setUserId(userId)
+        DevAuthContext.clearUserId()
+        assertEquals(null, DevAuthContext.getUserId())
     }
 
     @Test
     fun testUserIdIsNull() {
-        val userId = AuthContext.getUserId()
+        val userId = DevAuthContext.getUserId()
         assertNull(userId)
     }
 }
