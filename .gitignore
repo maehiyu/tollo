@@ -57,3 +57,4 @@ coverage/
 *.klib
 .kotlin/
 kls_database.db
+.vite/
