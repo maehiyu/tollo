@@ -12,6 +12,7 @@ import (
 
 	chatpb "github.com/maehiyu/tollo/gen/go/protos/chatservice"
 	userpb "github.com/maehiyu/tollo/gen/go/protos/userservice"
+	"github.com/maehiyu/tollo/internal/auth"
 	"github.com/maehiyu/tollo/internal/gateway/graph"
 	"github.com/rs/cors"
 )
@@ -57,12 +58,12 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	mux.Handle("/query", srv)
+	mux.Handle("/query", auth.DevAuthMiddleware(srv))
 
 	handler := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:5173"},
 		AllowCredentials: true,
-		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization", "X-User-ID"},
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		Debug:            true,
 	}).Handler(mux)
