@@ -22,11 +22,13 @@ kotlin {
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
       }
     }
-    val jvmMain by getting {
-      dependsOn(commonMain)
+    val commonTest by getting {
+      dependencies {
+        implementation(kotlin("test"))
+      }
     }
+    val jvmMain by getting
     val jsMain by getting {
-      dependsOn(commonMain)
       dependencies {
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-js:1.9.0")
       }
