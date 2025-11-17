@@ -10,6 +10,7 @@ import (
 
 	chatpb "github.com/maehiyu/tollo/gen/go/protos/chatservice"
 	userpb "github.com/maehiyu/tollo/gen/go/protos/userservice"
+	"github.com/maehiyu/tollo/internal/auth"
 	"github.com/maehiyu/tollo/internal/gateway/graph/model"
 )
 
@@ -82,9 +83,13 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 	if input.Professional == nil && input.General == nil {
 		return nil, fmt.Errorf("input error: profile is required, either professional or general must be provided")
 	}
+	email, err := auth.GetUserEmailFromContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user email from context: %w", err)
+	}
 	req := &userpb.CreateUserRequest{
 		Name:  input.Name,
-		Email: input.Email,
+		Email: email,
 	}
 	if input.Description != nil {
 		req.Description = *input.Description
@@ -128,6 +133,11 @@ func (r *mutationResolver) CreateChat(ctx context.Context, input model.CreateCha
 	}
 
 	return r.Resolver.ProtoChatToGraphQLChat(res.Chat), nil
+}
+
+// Me is the resolver for the me field.
+func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: Me - me"))
 }
 
 // User is the resolver for the user field.

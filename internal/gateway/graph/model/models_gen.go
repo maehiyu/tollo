@@ -44,7 +44,6 @@ type CreateChatInput struct {
 
 type CreateUserInput struct {
 	Name         string                    `json:"name"`
-	Email        string                    `json:"email"`
 	Description  *string                   `json:"description,omitempty"`
 	Professional *ProfessionalProfileInput `json:"professional,omitempty"`
 	General      *GeneralProfileInput      `json:"general,omitempty"`
