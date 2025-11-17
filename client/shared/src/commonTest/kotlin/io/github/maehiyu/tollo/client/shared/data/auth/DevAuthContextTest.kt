@@ -8,33 +8,38 @@ import kotlin.test.assertNull
 class DevAuthContextTest {
     @BeforeTest
     fun setUp() {
-        DevAuthContext.clearUserId()
+        DevAuthContext.clearUser()
     }
 
     @Test
-    fun testSetAndGetUserId() {
+    fun testSetAndGetUserIdAndEmail() {
         // Given
         val userId = "user-123"
+        val email = "test@sample.com"
 
         // When
-        DevAuthContext.setUserId(userId)
+        DevAuthContext.setUser(userId, email)
 
         // Then
         assertEquals(userId, DevAuthContext.getUserId())
+        assertEquals(email, DevAuthContext.getEmail())
     }
 
     @Test
-    fun testClearUserId() {
+    fun testClearUser() {
         val userId = "user-123"
-
-        DevAuthContext.setUserId(userId)
-        DevAuthContext.clearUserId()
+        val email = "test@sample.com"
+        DevAuthContext.setUser(userId, email)
+        DevAuthContext.clearUser()
         assertEquals(null, DevAuthContext.getUserId())
+        assertEquals(null, DevAuthContext.getEmail())
     }
 
     @Test
-    fun testUserIdIsNull() {
+    fun testUserIdAndEmailAreNull() {
         val userId = DevAuthContext.getUserId()
+        val email = DevAuthContext.getEmail()
         assertNull(userId)
+        assertNull(email)
     }
 }

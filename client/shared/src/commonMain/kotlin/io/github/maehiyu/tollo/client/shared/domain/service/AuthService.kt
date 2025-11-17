@@ -5,16 +5,19 @@ import io.github.maehiyu.tollo.client.shared.domain.auth.AuthContext
 
 class AuthService(val authContext: AuthContext) {
     fun login(email: String, password: String): String? {
-        authContext.setUserId(email)
+        authContext.setUser(email, email)
         return email
     }
     fun logout() {
-        authContext.clearUserId()
+        authContext.clearUser()
     }
     fun isLoggedIn(): Boolean {
         return authContext.getUserId() != null
     }
     fun getCurrentUserId(): String? {
         return authContext.getUserId()
+    }
+    fun getCurrentUserEmail(): String? {
+        return authContext.getEmail()
     }
 }

@@ -11,7 +11,7 @@ class AuthServiceTest {
     val authService = AuthService(DevAuthContext)
     @BeforeTest
     fun setUp() {
-        DevAuthContext.clearUserId()
+        DevAuthContext.clearUser()
     }
 
     @Test
@@ -37,5 +37,10 @@ class AuthServiceTest {
     fun testGetCurrentUserId() {
         val userId = authService.login("test@sample.com", "password")
         assertEquals(userId,authService.getCurrentUserId())
+    }
+    @Test
+    fun testGetEmail() {
+        val email = authService.login("test@sample.com", "password")
+        assertEquals(email, authService.getCurrentUserEmail())
     }
 }

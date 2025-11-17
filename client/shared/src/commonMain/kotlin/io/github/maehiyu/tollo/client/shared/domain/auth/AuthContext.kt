@@ -1,7 +1,8 @@
 package io.github.maehiyu.tollo.client.shared.domain.auth
 
 interface AuthContext {
-    fun setUserId(userId: String)
+    fun setUser(userId: String, email: String)
     fun getUserId(): String?
-    fun clearUserId()
+    fun getEmail(): String?
+    fun clearUser()
 }
