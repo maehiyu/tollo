@@ -137,7 +137,16 @@ func (r *mutationResolver) CreateChat(ctx context.Context, input model.CreateCha
 
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: Me - me"))
+	userId, err := auth.GetUserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	res, err := r.Resolver.UserClient.GetUser(ctx, &userpb.GetUserRequest{LookupBy: &userpb.GetUserRequest_Id{Id: userId}})
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Resolver.ProtoUserToGraphQLUser(res), nil
 }
 
 // User is the resolver for the user field.
