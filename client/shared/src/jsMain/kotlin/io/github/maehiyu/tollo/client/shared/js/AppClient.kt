@@ -28,8 +28,13 @@ private val userServiceInstance: UserService = UserService(userRepository)
 
 // AuthService wrapper functions
 @JsExport
-fun login(email: String, password: String) {
-    authServiceInstance.login(email, password)
+fun signUp(email: String, password: String): String? {
+    return authServiceInstance.signUp(email, password)
+}
+
+@JsExport
+fun login(email: String, password: String): String? {
+    return authServiceInstance.login(email, password)
 }
 
 @JsExport
