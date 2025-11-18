@@ -83,11 +83,11 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 	if input.Professional == nil && input.General == nil {
 		return nil, fmt.Errorf("input error: profile is required, either professional or general must be provided")
 	}
-	email, err := auth.GetUserEmailFromContext(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get user email from context: %w", err)
-	}
+	userID := auth.MustGetUserIDFromContext(ctx)
+	email := auth.MustGetUserEmailFromContext(ctx)
+
 	req := &userpb.CreateUserRequest{
+		Id:    userID,
 		Name:  input.Name,
 		Email: email,
 	}
@@ -137,10 +137,7 @@ func (r *mutationResolver) CreateChat(ctx context.Context, input model.CreateCha
 
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
-	userId, err := auth.GetUserIDFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
+	userId := auth.MustGetUserIDFromContext(ctx)
 	res, err := r.Resolver.UserClient.GetUser(ctx, &userpb.GetUserRequest{LookupBy: &userpb.GetUserRequest_Id{Id: userId}})
 	if err != nil {
 		return nil, err

@@ -46,12 +46,13 @@ message CreateUserRequest {
     expression: "this.professional != null || this.general != null"
   };
 
-  string name = 1 [(buf.validate.field).string.min_len = 1];
-  string email = 2 [(buf.validate.field).string.min_len = 1];
-  string description = 3;
+  string id = 1 [(buf.validate.field).string.uuid = true];
+  string name = 2 [(buf.validate.field).string.min_len = 1];
+  string email = 3 [(buf.validate.field).string.min_len = 1];
+  string description = 4;
   oneof profile {
-    ProfessionalProfile professional = 4;
-    GeneralProfile general = 5;
+    ProfessionalProfile professional = 5;
+    GeneralProfile general = 6;
   }
 }
 

@@ -36,7 +36,7 @@ type User struct {
 	UpdatedAt time.Time
 }
 
-func NewUser(id string, name string, email Email, profile Profile) (*User, error) {
+func NewUser(id string, email Email, name string, profile Profile) (*User, error) {
 	if id == "" {
 		return nil, ErrEmptyID
 	}
@@ -50,8 +50,8 @@ func NewUser(id string, name string, email Email, profile Profile) (*User, error
 	now := time.Now()
 	return &User{
 		ID:        id,
-		Name:      name,
 		Email:     email,
+		Name:      name,
 		Profile:   profile,
 		CreatedAt: now,
 		UpdatedAt: now,

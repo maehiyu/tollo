@@ -38,29 +38,31 @@ func (s *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb
 	if err := validator.Validate(req); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "validation error: %v", err)
 	}
-	email, err := s.emailFromString(req.GetEmail())
+
+	userID := req.GetId()
+	email, err := user.NewEmail(req.GetEmail())
 	if err != nil {
 		return nil, err
 	}
-
 	profile, err := s.profileFromCreateRequest(req)
 	if err != nil {
 		return nil, err
 	}
 
 	input := &CreateUserInput{
-		Name:    req.GetName(),
+		ID:      userID,
 		Email:   email,
+		Name:    req.GetName(),
 		Profile: profile,
 	}
 
 	createdUser, err := s.usecase.CreateUser(ctx, input)
 	if err != nil {
 		if errors.Is(err, user.ErrEmailAlreadyExists) {
-			return nil, status.Errorf(codes.AlreadyExists, err.Error())
+			return nil, status.Error(codes.AlreadyExists, err.Error())
 		}
 		if errors.Is(err, user.ErrEmptyID) || errors.Is(err, user.ErrEmptyName) || errors.Is(err, user.ErrNilProfile) {
-			return nil, status.Errorf(codes.InvalidArgument, err.Error())
+			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal, "failed to create user: %v", err)
 	}
@@ -107,11 +109,10 @@ func (s *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb
 	if err := validator.Validate(req); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "validation error: %v", err)
 	}
-	id := req.GetId()
 	if req.GetData() == nil || req.GetUpdateMask() == nil || len(req.GetUpdateMask().GetPaths()) == 0 {
 		return nil, status.Errorf(codes.InvalidArgument, "update data and mask are required")
 	}
-	input := &UpdateUserInput{}
+	input := &UpdateUserInput{ID: req.GetId()}
 
 	for _, path := range req.GetUpdateMask().GetPaths() {
 		switch path {
@@ -126,7 +127,7 @@ func (s *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb
 			input.Profile = &profile
 		}
 	}
-	updatedUser, err := s.usecase.UpdateUser(ctx, id, input)
+	updatedUser, err := s.usecase.UpdateUser(ctx, input)
 	if err != nil {
 		if errors.Is(err, user.ErrNotFound) {
 			return nil, status.Errorf(codes.NotFound, "user not found")
@@ -195,7 +196,7 @@ func (s *Server) emailFromString(emailStr string) (user.Email, error) {
 	email, err := user.NewEmail(emailStr)
 	if err != nil {
 		if errors.Is(err, user.ErrInvalidEmail) {
-			return "", status.Errorf(codes.InvalidArgument, err.Error())
+			return "", status.Error(codes.InvalidArgument, err.Error())
 		}
 		return "", status.Errorf(codes.Internal, "unexpected error during email validation: %v", err)
 	}

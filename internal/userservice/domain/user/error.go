@@ -3,7 +3,7 @@ package user
 import "errors"
 
 var (
-	ErrNotFound           = errors.New("user: not founc")
+	ErrNotFound           = errors.New("user: not found")
 	ErrEmailAlreadyExists = errors.New("user: email already exists")
 	ErrInvalidID          = errors.New("user: invalid id format")
 	ErrEmptyID            = errors.New("user: id cannot be empty")

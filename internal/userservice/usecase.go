@@ -5,17 +5,18 @@ import (
 	"errors"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/maehiyu/tollo/internal/userservice/domain/user"
 )
 
 type CreateUserInput struct {
-	Name    string
+	ID      string
 	Email   user.Email
+	Name    string
 	Profile user.Profile
 }
 
 type UpdateUserInput struct {
+	ID      string
 	Name    *string
 	Profile *user.Profile
 }
@@ -24,7 +25,7 @@ type Usecase interface {
 	CreateUser(ctx context.Context, input *CreateUserInput) (*user.User, error)
 	GetUserByID(ctx context.Context, id string) (*user.User, error)
 	GetUserByEmail(ctx context.Context, email user.Email) (*user.User, error)
-	UpdateUser(ctx context.Context, id string, input *UpdateUserInput) (*user.User, error)
+	UpdateUser(ctx context.Context, input *UpdateUserInput) (*user.User, error)
 	DeleteUser(ctx context.Context, id string) error
 }
 
@@ -39,18 +40,18 @@ func NewUsecase(userRepo user.UserRepository) Usecase {
 }
 
 func (u *usecase) CreateUser(ctx context.Context, input *CreateUserInput) (*user.User, error) {
-	_, err := u.userRepo.FindByEmail(ctx, input.Email)
-	if err != nil && !errors.Is(err, user.ErrNotFound) {
-		return nil, err
-	}
+	_, err := u.userRepo.FindByID(ctx, input.ID)
 	if err == nil {
-		return nil, user.ErrEmailAlreadyExists
+		return nil, errors.New("user already exists")
+	}
+	if !errors.Is(err, user.ErrNotFound) {
+		return nil, err
 	}
 
 	newUser, err := user.NewUser(
-		uuid.NewString(),
-		input.Name,
+		input.ID,
 		input.Email,
+		input.Name,
 		input.Profile,
 	)
 	if err != nil {
@@ -79,8 +80,8 @@ func (u *usecase) GetUserByEmail(ctx context.Context, email user.Email) (*user.U
 	return foundUser, nil
 }
 
-func (u *usecase) UpdateUser(ctx context.Context, id string, input *UpdateUserInput) (*user.User, error) {
-	targetUser, err := u.userRepo.FindByID(ctx, id)
+func (u *usecase) UpdateUser(ctx context.Context, input *UpdateUserInput) (*user.User, error) {
+	targetUser, err := u.userRepo.FindByID(ctx, input.ID)
 	if err != nil {
 		return nil, err
 	}
