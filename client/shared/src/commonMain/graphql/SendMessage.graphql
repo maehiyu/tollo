@@ -1,0 +1,27 @@
+mutation SendMessage($input: SendMessageInput!) {
+  sendMessage(input: $input) {
+    id
+    chatId
+    senderId
+    sentAt
+    payload {
+      ... on StandardMessage {
+        content
+      }
+      ... on QuestionMessage {
+        content
+        tags
+      }
+      ... on AnswerMessage {
+        content
+        questionId
+      }
+      ... on PromotionalMessage {
+        title
+        body
+        actionUrl
+        imageUrl
+      }
+    }
+  }
+}
