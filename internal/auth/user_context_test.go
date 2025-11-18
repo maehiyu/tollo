@@ -7,38 +7,30 @@ import (
 
 func TestSetUserOnContext(t *testing.T) {
 	tests := []struct {
-		name    string
-		input   context.Context
-		want    string
-		wantErr bool
+		name      string
+		input     context.Context
+		wantID    string
+		wantEmail string
+		wantErr   bool
 	}{
 		{
-			name:    "user exists",
-			input:   SetUserInContext(context.Background(), "user-123"),
-			want:    "user-123",
-			wantErr: false,
-		},
-		{
-			name:    "no user",
-			input:   context.Background(),
-			want:    "",
-			wantErr: true,
-		}, {
-			name:    "wrong type",
-			input:   context.WithValue(context.Background(), userContextKey, 123),
-			want:    "",
-			wantErr: true,
+			name:      "user exists",
+			input:     SetUserInContext(context.Background(), "user-123", "test@sample.com"),
+			wantID:    "user-123",
+			wantEmail: "test@sample.com",
+			wantErr:   false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetUserFromContext(tt.input)
+			gotID := MustGetUserIDFromContext(tt.input)
+			gotEmail := MustGetUserEmailFromContext(tt.input)
 
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetUserFromContext() error = %v, wantErr %v", err, tt.wantErr)
+			if gotID != tt.wantID {
+				t.Errorf("got %v, want %v", gotID, tt.wantID)
 			}
-			if got != tt.want {
-				t.Errorf("got %v, want %v", got, tt.want)
+			if gotEmail != tt.wantEmail {
+				t.Errorf("got %v, want %v", gotEmail, tt.wantEmail)
 			}
 		})
 	}

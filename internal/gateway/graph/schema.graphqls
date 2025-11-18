@@ -5,6 +5,7 @@
 scalar Time
 
 type Query {
+  me: User # Get currently authenticated user
   user(id: ID, email: String): User
   userChats(userID: ID!): [Chat!]! # New query for chat list
   chatMessages(chatID: ID!): [Message!]! # New query for messages of a specific chat
@@ -27,7 +28,6 @@ union UserProfile = ProfessionalProfile | GeneralProfile
 # Input for the createUser mutation
 input CreateUserInput {
   name: String!
-  email: String!
   description: String
   professional: ProfessionalProfileInput
   general: GeneralProfileInput

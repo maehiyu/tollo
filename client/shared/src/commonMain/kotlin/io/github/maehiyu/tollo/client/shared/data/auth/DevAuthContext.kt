@@ -8,16 +8,23 @@ import io.github.maehiyu.tollo.client.shared.domain.auth.AuthContext
  */
 object DevAuthContext : AuthContext {
     private var userId: String? = null
+    private var email: String? = null
 
-    override fun setUserId(userId: String) {
+    override fun setUser(userId: String, email: String) {
         this.userId = userId
+        this.email = email
     }
 
     override fun getUserId(): String? {
         return userId
     }
 
-    override fun clearUserId() {
+    override fun getEmail(): String? {
+        return email
+    }
+
+    override fun clearUser() {
         userId = null
+        email = null
     }
 }

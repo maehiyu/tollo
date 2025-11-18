@@ -1,14 +1,17 @@
 import { useState } from 'react';
-import { createUser, getUserByEmail, JsUser } from 'shared';
+import { createUser, JsUser } from 'shared';
 import './UserForm.css';
 
 // Define the type for the created user based on the GraphQL schema
 // This helps with type safety and autocompletion.
 type CreatedUser = JsUser;
 
-function UserForm() {
+interface UserFormProps {
+  onComplete?: () => void;
+}
+
+function UserForm({ onComplete }: UserFormProps) {
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
   const [description, setDescription] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -24,12 +27,6 @@ function UserForm() {
   // Professional Profile states
   const [proBadgeUrl, setProBadgeUrl] = useState('');
   const [proBiography, setProBiography] = useState('');
-
-  // Search states
-  const [searchEmail, setSearchEmail] = useState('');
-  const [searchedUser, setSearchedUser] = useState<CreatedUser | null>(null);
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [searchError, setSearchError] = useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -55,7 +52,6 @@ function UserForm() {
 
       const user = await createUser(
         name,
-        email,
         description || null,
         generalProfile,
         professionalProfile
@@ -65,13 +61,16 @@ function UserForm() {
         setCreatedUser(user);
         // Clear form on success
         setName('');
-        setEmail('');
         setDescription('');
         setProfileType('none');
         setGeneralPoints('');
         setGeneralIntroduction('');
         setProBadgeUrl('');
         setProBiography('');
+        // Notify parent component
+        if (onComplete) {
+          onComplete();
+        }
       } else {
         setError('Failed to create user. The server returned no user data.');
       }
@@ -81,29 +80,6 @@ function UserForm() {
       setError(message);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleSearch = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setSearchLoading(true);
-    setSearchError(null);
-    setSearchedUser(null);
-
-    try {
-      const user = await getUserByEmail(searchEmail);
-      console.log('Received user from getUserByEmail:', user);
-      if (user) {
-        setSearchedUser(user);
-      } else {
-        setSearchError('User not found with this email.');
-      }
-    } catch (e: unknown) {
-      console.error('[React] Error searching user:', e);
-      const message = e instanceof Error ? e.message: 'An unknown error occurred.';
-      setSearchError(message);
-    } finally {
-      setSearchLoading(false);
     }
   };
 
@@ -118,16 +94,6 @@ function UserForm() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="email">Email:</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
@@ -236,36 +202,6 @@ function UserForm() {
           <p><strong>ID:</strong> {createdUser.id}</p>
           <p><strong>Name:</strong> {createdUser.name}</p>
           <p><strong>Email:</strong> {createdUser.email}</p>
-        </div>
-      )}
-
-      <hr />
-
-      <h2>Search User by Email</h2>
-      <form onSubmit={handleSearch}>
-        <div className="form-group">
-          <label htmlFor="searchEmail">Email:</label>
-          <input
-            id="searchEmail"
-            type="email"
-            value={searchEmail}
-            onChange={(e) => setSearchEmail(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit" disabled={searchLoading}>
-          {searchLoading ? 'Searching...' : 'Search User'}
-        </button>
-      </form>
-
-      {searchError && <p className="error-message">Error: {searchError}</p>}
-
-      {searchedUser && (
-        <div className="success-message">
-          <h3>User Found!</h3>
-          <p><strong>ID:</strong> {searchedUser.id}</p>
-          <p><strong>Name:</strong> {searchedUser.name}</p>
-          <p><strong>Email:</strong> {searchedUser.email}</p>
         </div>
       )}
     </div>

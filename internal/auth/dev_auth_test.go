@@ -7,49 +7,94 @@ import (
 )
 
 func TestDevAuthMiddleware(t *testing.T) {
-	t.Run("header exists", func(t *testing.T) {
-		nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			userID, err := GetUserFromContext(r.Context())
+	tests := []struct {
+		name           string
+		useridheader   string
+		emailheader    string
+		wantstatus     int
+		wantuserid     string
+		wantemail      string
+		expectnextcall bool
+	}{
+		{
+			name:           "both headers exist",
+			useridheader:   "user-123",
+			emailheader:    "test@example.com",
+			wantstatus:     http.StatusOK,
+			wantuserid:     "user-123",
+			wantemail:      "test@example.com",
+			expectnextcall: true,
+		},
+		{
+			name:           "only user-id header",
+			useridheader:   "user-123",
+			emailheader:    "",
+			wantstatus:     http.StatusUnauthorized,
+			wantuserid:     "",
+			wantemail:      "",
+			expectnextcall: false,
+		},
+		{
+			name:           "only email header",
+			useridheader:   "",
+			emailheader:    "test@example.com",
+			wantstatus:     http.StatusUnauthorized,
+			wantuserid:     "",
+			wantemail:      "",
+			expectnextcall: false,
+		},
+		{
+			name:           "no headers",
+			useridheader:   "",
+			emailheader:    "",
+			wantstatus:     http.StatusUnauthorized,
+			wantuserid:     "",
+			wantemail:      "",
+			expectnextcall: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			nextCalled := false
+			nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				nextCalled = true
 
-			if err != nil {
-				t.Errorf("context should have user_id")
+				// expectnextcallがfalseなのに呼ばれた場合はエラー
+				if !tt.expectnextcall {
+					t.Error("next handler should not be called")
+				}
+
+				gotID := MustGetUserIDFromContext(r.Context())
+				gotEmail := MustGetUserEmailFromContext(r.Context())
+
+				if gotID != tt.wantuserid {
+					t.Errorf("gotID %v, want %v", gotID, tt.wantuserid)
+				}
+				if gotEmail != tt.wantemail {
+					t.Errorf("gotEmail %v, want %v", gotEmail, tt.wantemail)
+				}
+				w.WriteHeader(http.StatusOK)
+			})
+			handler := DevAuthMiddleware(nextHandler)
+
+			req := httptest.NewRequest("GET", "/test", nil)
+			if tt.useridheader != "" {
+				req.Header.Set("X-User-ID", tt.useridheader)
 			}
-			if userID != "user-123" {
-				t.Errorf("got %v, want user-123", userID)
+			if tt.emailheader != "" {
+				req.Header.Set("X-User-Email", tt.emailheader)
 			}
-			w.WriteHeader(http.StatusOK)
+			w := httptest.NewRecorder()
+
+			handler.ServeHTTP(w, req)
+
+			if w.Code != tt.wantstatus {
+				t.Errorf("status should be %d, got %d", tt.wantstatus, w.Code)
+			}
+
+			if nextCalled != tt.expectnextcall {
+				t.Errorf("nextCalled = %v, want %v", nextCalled, tt.expectnextcall)
+			}
 		})
-		handler := DevAuthMiddleware(nextHandler)
-
-		req := httptest.NewRequest("GET", "/test", nil)
-		req.Header.Set("X-User-ID", "user-123")
-		w := httptest.NewRecorder()
-
-		handler.ServeHTTP(w, req)
-	})
-	t.Run("no header", func(t *testing.T) {
-		nextCalled := false
-		nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			nextCalled = true
-			_, err := GetUserFromContext(r.Context())
-
-			if err != nil {
-				t.Fatalf("GetUserFromContext() error = %v", err)
-			}
-
-			w.WriteHeader(http.StatusOK)
-		})
-		handler := DevAuthMiddleware(nextHandler)
-
-		req := httptest.NewRequest("GET", "/text", nil)
-		w := httptest.NewRecorder()
-
-		handler.ServeHTTP(w, req)
-		if nextCalled != false {
-			t.Errorf("next should not be called")
-		}
-		if w.Code != http.StatusUnauthorized {
-			t.Errorf("status should be %d, got %d", http.StatusUnauthorized, w.Code)
-		}
-	})
+	}
 }

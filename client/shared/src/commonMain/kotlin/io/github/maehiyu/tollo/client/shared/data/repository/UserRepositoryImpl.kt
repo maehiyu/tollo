@@ -4,6 +4,7 @@ import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
 import io.github.maehiyu.tollo.client.shared.CreateUserMutation
 import io.github.maehiyu.tollo.client.shared.GetUserQuery
+import io.github.maehiyu.tollo.client.shared.MeQuery
 import io.github.maehiyu.tollo.client.shared.domain.repository.UserRepository
 import io.github.maehiyu.tollo.client.shared.type.GeneralProfileInput
 import io.github.maehiyu.tollo.client.shared.type.ProfessionalProfileInput
@@ -31,9 +32,24 @@ class UserRepositoryImpl(private val apolloClient: ApolloClient) : UserRepositor
         }
     }
 
+    override suspend fun getCurrentUser(): MeQuery.Me? {
+        return try {
+            val response = apolloClient.query(MeQuery()).execute()
+            if (response.hasErrors()) {
+                println("GraphQL Errors: ${response.errors}")
+                return null
+            }
+            println("Me Response Data: ${response.data}")
+            println("Current User: ${response.data?.me}")
+            response.data?.me
+        } catch (e: Exception) {
+            println("Network or other exception: ${e.message}")
+            return null
+        }
+    }
+
     override suspend fun createUser(
-      name: String, 
-      email: String, 
+      name: String,
       description: String?,
       general: GeneralProfileInput?,
       professional: ProfessionalProfileInput?
@@ -42,7 +58,6 @@ class UserRepositoryImpl(private val apolloClient: ApolloClient) : UserRepositor
             val response = apolloClient.mutation(
                 CreateUserMutation(
                     name = name,
-                    email = email,
                     description = Optional.presentIfNotNull(description),
                     general = Optional.presentIfNotNull(general),
                     professional = Optional.presentIfNotNull(professional)

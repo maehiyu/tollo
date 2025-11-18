@@ -10,6 +10,7 @@ import (
 
 	chatpb "github.com/maehiyu/tollo/gen/go/protos/chatservice"
 	userpb "github.com/maehiyu/tollo/gen/go/protos/userservice"
+	"github.com/maehiyu/tollo/internal/auth"
 	"github.com/maehiyu/tollo/internal/gateway/graph/model"
 )
 
@@ -82,9 +83,13 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 	if input.Professional == nil && input.General == nil {
 		return nil, fmt.Errorf("input error: profile is required, either professional or general must be provided")
 	}
+	userID := auth.MustGetUserIDFromContext(ctx)
+	email := auth.MustGetUserEmailFromContext(ctx)
+
 	req := &userpb.CreateUserRequest{
+		Id:    userID,
 		Name:  input.Name,
-		Email: input.Email,
+		Email: email,
 	}
 	if input.Description != nil {
 		req.Description = *input.Description
@@ -128,6 +133,17 @@ func (r *mutationResolver) CreateChat(ctx context.Context, input model.CreateCha
 	}
 
 	return r.Resolver.ProtoChatToGraphQLChat(res.Chat), nil
+}
+
+// Me is the resolver for the me field.
+func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
+	userId := auth.MustGetUserIDFromContext(ctx)
+	res, err := r.Resolver.UserClient.GetUser(ctx, &userpb.GetUserRequest{LookupBy: &userpb.GetUserRequest_Id{Id: userId}})
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Resolver.ProtoUserToGraphQLUser(res), nil
 }
 
 // User is the resolver for the user field.

@@ -253,9 +253,10 @@ func (*UserInfo_GeneralProfile) isUserInfo_Profile() {}
 
 type CreateUserRequest struct {
 	state       protoimpl.MessageState `protogen:"open.v1"`
-	Name        string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Email       string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	Description string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Id          string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name        string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Email       string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+	Description string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
 	// Types that are valid to be assigned to Profile:
 	//
 	//	*CreateUserRequest_Professional
@@ -293,6 +294,13 @@ func (x *CreateUserRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use CreateUserRequest.ProtoReflect.Descriptor instead.
 func (*CreateUserRequest) Descriptor() ([]byte, []int) {
 	return file_protos_userservice_user_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CreateUserRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
 }
 
 func (x *CreateUserRequest) GetName() string {
@@ -346,11 +354,11 @@ type isCreateUserRequest_Profile interface {
 }
 
 type CreateUserRequest_Professional struct {
-	Professional *ProfessionalProfile `protobuf:"bytes,4,opt,name=professional,proto3,oneof"`
+	Professional *ProfessionalProfile `protobuf:"bytes,5,opt,name=professional,proto3,oneof"`
 }
 
 type CreateUserRequest_General struct {
-	General *GeneralProfile `protobuf:"bytes,5,opt,name=general,proto3,oneof"`
+	General *GeneralProfile `protobuf:"bytes,6,opt,name=general,proto3,oneof"`
 }
 
 func (*CreateUserRequest_Professional) isCreateUserRequest_Profile() {}
@@ -564,13 +572,14 @@ const file_protos_userservice_user_proto_rawDesc = "" +
 	"updated_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12U\n" +
 	"\x14professional_profile\x18\a \x01(\v2 .userservice.ProfessionalProfileH\x00R\x13professionalProfile\x12F\n" +
 	"\x0fgeneral_profile\x18\b \x01(\v2\x1b.userservice.GeneralProfileH\x00R\x0egeneralProfileB\t\n" +
-	"\aprofile\"\xf0\x02\n" +
-	"\x11CreateUserRequest\x12\x1b\n" +
-	"\x04name\x18\x01 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x04name\x12\x1d\n" +
-	"\x05email\x18\x02 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x05email\x12 \n" +
-	"\vdescription\x18\x03 \x01(\tR\vdescription\x12F\n" +
-	"\fprofessional\x18\x04 \x01(\v2 .userservice.ProfessionalProfileH\x00R\fprofessional\x127\n" +
-	"\ageneral\x18\x05 \x01(\v2\x1b.userservice.GeneralProfileH\x00R\ageneral:q\xbaHn\x1al\n" +
+	"\aprofile\"\x8a\x03\n" +
+	"\x11CreateUserRequest\x12\x18\n" +
+	"\x02id\x18\x01 \x01(\tB\b\xbaH\x05r\x03\xb0\x01\x01R\x02id\x12\x1b\n" +
+	"\x04name\x18\x02 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x04name\x12\x1d\n" +
+	"\x05email\x18\x03 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x05email\x12 \n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\x12F\n" +
+	"\fprofessional\x18\x05 \x01(\v2 .userservice.ProfessionalProfileH\x00R\fprofessional\x127\n" +
+	"\ageneral\x18\x06 \x01(\v2\x1b.userservice.GeneralProfileH\x00R\ageneral:q\xbaHn\x1al\n" +
 	"\"CreateUserRequest.profile.required\x12\x13profile is required\x1a1this.professional != null || this.general != nullB\t\n" +
 	"\aprofile\"Q\n" +
 	"\x0eGetUserRequest\x12\x1a\n" +

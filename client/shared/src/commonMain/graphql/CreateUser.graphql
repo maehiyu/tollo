@@ -1,6 +1,5 @@
 mutation CreateUser(
   $name: String!
-  $email: String!
   $description: String
   $general: GeneralProfileInput
   $professional: ProfessionalProfileInput
@@ -8,7 +7,6 @@ mutation CreateUser(
   createUser(
     input: {
       name: $name
-      email: $email
       description: $description
       general: $general
       professional: $professional

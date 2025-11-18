@@ -16,10 +16,12 @@ class AuthInterceptor(private val authContext: AuthContext) : HttpInterceptor {
         chain: HttpInterceptorChain
     ): HttpResponse {
         val userId = authContext.getUserId()
+        var email = authContext.getEmail()
 
-        val newRequest = if (userId != null) {
+        val newRequest = if (userId != null && email != null) {
             request.newBuilder()
                 .addHeader("X-User-ID", userId)
+                .addHeader("X-User-Email", email)
                 .build()
         } else {
             request

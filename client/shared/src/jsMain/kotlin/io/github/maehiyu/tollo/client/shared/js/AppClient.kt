@@ -28,8 +28,13 @@ private val userServiceInstance: UserService = UserService(userRepository)
 
 // AuthService wrapper functions
 @JsExport
-fun login(email: String, password: String) {
-    authServiceInstance.login(email, password)
+fun signUp(email: String, password: String): String? {
+    return authServiceInstance.signUp(email, password)
+}
+
+@JsExport
+fun login(email: String, password: String): String? {
+    return authServiceInstance.login(email, password)
 }
 
 @JsExport
@@ -84,9 +89,16 @@ fun getUserByEmail(email: String): Promise<JsUser?> =
     }
 
 @JsExport
+fun getCurrentUser(): Promise<JsUser?> =
+    CoroutineScope(Dispatchers.Unconfined).promise {
+        userServiceInstance.getCurrentUser()?.let { user ->
+            JsUser(user.id, user.name, user.email, user.createdAt.toString())
+        }
+    }
+
+@JsExport
 fun createUser(
   name: String,
-  email: String,
   description: String?,
   generalProfile: JsGeneralProfile?,
   professionalProfile: JsProfessionalProfile?
@@ -98,7 +110,7 @@ fun createUser(
       val professionalInput = professionalProfile?.let {
         ProfessionalProfileInput(it.proBadgeUrl, it.biography)
       }
-      userServiceInstance.createUser(name, email, description, generalInput, professionalInput)?.let { user ->
+      userServiceInstance.createUser(name, description, generalInput, professionalInput)?.let { user ->
           JsUser(user.id, user.name, user.email, user.createdAt.toString())
       }
     }
