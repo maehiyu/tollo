@@ -64,18 +64,8 @@ func TestDevAuthMiddleware(t *testing.T) {
 					t.Error("next handler should not be called")
 				}
 
-				gotID, IDErr := GetUserIDFromContext(r.Context())
-				gotEmail, emailErr := GetUserEmailFromContext(r.Context())
-
-				// エラーチェック
-				if tt.expectnextcall {
-					if IDErr != nil {
-						t.Errorf("GetUserIDFromContext() should not error, got %v", IDErr)
-					}
-					if emailErr != nil {
-						t.Errorf("GetUserEmailFromContext() should not error, got %v", emailErr)
-					}
-				}
+				gotID := MustGetUserIDFromContext(r.Context())
+				gotEmail := MustGetUserEmailFromContext(r.Context())
 
 				if gotID != tt.wantuserid {
 					t.Errorf("gotID %v, want %v", gotID, tt.wantuserid)

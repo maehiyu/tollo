@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"errors"
 )
 
 type contextKey string
@@ -16,18 +15,19 @@ func SetUserInContext(ctx context.Context, userID string, email string) context.
 	return ctx
 }
 
-func GetUserIDFromContext(ctx context.Context) (string, error) {
-	userID, err := ctx.Value(userIDContextKey).(string)
-	if !err {
-		return "", errors.New("id not found in context")
+func MustGetUserIDFromContext(ctx context.Context) string {
+	userID, ok := ctx.Value(userIDContextKey).(string)
+	if !ok {
+		panic("User ID not in context - middleware misconfigured")
 	}
-	return userID, nil
+
+	return userID
 }
 
-func GetUserEmailFromContext(ctx context.Context) (string, error) {
-	email, err := ctx.Value(userEmailContextKey).(string)
-	if !err {
-		return "", errors.New("email not found in context")
+func MustGetUserEmailFromContext(ctx context.Context) string {
+	email, ok := ctx.Value(userEmailContextKey).(string)
+	if !ok {
+		panic("Email not in context - middleware misconfigured")
 	}
-	return email, nil
+	return email
 }
