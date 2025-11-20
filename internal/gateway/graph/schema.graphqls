@@ -129,8 +129,6 @@ input SendMessageInput {
 
   chatId: ID!
 
-  senderId: ID!
-
   standard: StandardMessageInput
 
   question: QuestionMessageInput

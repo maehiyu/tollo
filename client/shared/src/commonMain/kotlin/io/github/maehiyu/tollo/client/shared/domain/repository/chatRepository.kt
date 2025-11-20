@@ -14,7 +14,6 @@ interface ChatRepository {
     suspend fun getChatMessages(chatId: String): List<ChatMessagesQuery.ChatMessage>?
     suspend fun sendMessage(
         chatId: String,
-        senderId: String,
         standard: StandardMessageInput? = null,
         question: QuestionMessageInput? = null,
         answer: AnswerMessageInput? = null,

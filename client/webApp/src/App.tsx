@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom'
 import './App.css'
 import UserForm from './UserForm'
 import LoginPage from './LoginPage'
+import { ChatListPage } from './features/chat/pages/ChatListPage'
+import { ChatDetailPage } from './features/chat/pages/ChatDetailPage'
 import { isLoggedIn, getCurrentUser, logout, JsUser } from 'shared'
 
 function App() {
@@ -79,21 +82,39 @@ function App() {
   }
 
   return (
-    <>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>Tollo Q&A Platform</h1>
-        <div>
-          <span style={{ marginRight: '1rem' }}>
-            Logged in as: {user?.name} ({user?.email})
-          </span>
-          <button onClick={handleLogout}>Logout</button>
+    <BrowserRouter>
+      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', borderBottom: '1px solid #e0e0e0', backgroundColor: '#fff' }}>
+          <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+            <h1 style={{ margin: 0 }}>Tollo</h1>
+            <nav style={{ display: 'flex', gap: '16px' }}>
+              <Link to="/" style={{ textDecoration: 'none', color: '#0084ff' }}>Home</Link>
+              <Link to="/chat" style={{ textDecoration: 'none', color: '#0084ff' }}>Chats</Link>
+            </nav>
+          </div>
+          <div>
+            <span style={{ marginRight: '1rem' }}>
+              {user?.name} ({user?.email})
+            </span>
+            <button onClick={handleLogout}>Logout</button>
+          </div>
+        </div>
+
+        <div style={{ flex: 1 }}>
+          <Routes>
+            <Route path="/" element={
+              <div style={{ maxWidth: '800px', margin: '0 auto', padding: '24px' }}>
+                <h2>Welcome, {user?.name}!</h2>
+                <p>Your dashboard will be here...</p>
+              </div>
+            } />
+            <Route path="/chat" element={<ChatListPage />} />
+            <Route path="/chat/:chatId" element={<ChatDetailPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         </div>
       </div>
-      <div className="card">
-        <h2>Welcome, {user?.name}!</h2>
-        <p>Your dashboard will be here...</p>
-      </div>
-    </>
+    </BrowserRouter>
   )
 }
 

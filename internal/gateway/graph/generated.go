@@ -3871,7 +3871,7 @@ func (ec *executionContext) unmarshalInputSendMessageInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"chatId", "senderId", "standard", "question", "answer", "promotional"}
+	fieldsInOrder := [...]string{"chatId", "standard", "question", "answer", "promotional"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3885,13 +3885,6 @@ func (ec *executionContext) unmarshalInputSendMessageInput(ctx context.Context, 
 				return it, err
 			}
 			it.ChatID = data
-		case "senderId":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("senderId"))
-			data, err := ec.unmarshalNID2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.SenderID = data
 		case "standard":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("standard"))
 			data, err := ec.unmarshalOStandardMessageInput2ᚖgithubᚗcomᚋmaehiyuᚋtolloᚋinternalᚋgatewayᚋgraphᚋmodelᚐStandardMessageInput(ctx, v)

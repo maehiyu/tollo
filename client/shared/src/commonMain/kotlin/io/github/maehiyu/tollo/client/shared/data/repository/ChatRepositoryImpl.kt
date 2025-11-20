@@ -45,7 +45,6 @@ class ChatRepositoryImpl(private val apolloClient: ApolloClient) : ChatRepositor
     }
     override suspend fun sendMessage(
         chatId: String,
-        senderId: String,
         standard: StandardMessageInput?,
         question: QuestionMessageInput?,
         answer: AnswerMessageInput?,
@@ -54,7 +53,6 @@ class ChatRepositoryImpl(private val apolloClient: ApolloClient) : ChatRepositor
         return try {
             val input = SendMessageInput(
                 chatId = chatId,
-                senderId = senderId,
                 standard = Optional.presentIfNotNull(standard),
                 question = Optional.presentIfNotNull(question),
                 answer = Optional.presentIfNotNull(answer),
