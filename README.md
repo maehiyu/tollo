@@ -2,11 +2,50 @@
 
 ## プロジェクト概要
 本プロジェクトは、Q&Aプラットフォームをマイクロサービスアーキテクチャで構築しています。
-クライアントサイドではKotlin Multiplatform (KMP) を採用し、サービス定義にはApollo Kotlinを使用しています。共通ロジックはcommonMainで、プラットフォーム固有の実装はjsMainで管理されます。
+AIとプロフェッショナルの両方が回答できる仕組みで、RAGによる学習とリワードシステムを備えています。
+
+## システム概要
+
+### コア機能
+1. **質問 → AI回答 → プロ回答** のフロー
+   - ユーザーが質問を投稿
+   - AI (RAG) が即座に回答 + 精度スコア表示
+   - ユーザーがプロに聞くか選択
+   - プロとマッチングしてチャット形式で対話
+
+2. **RAG学習サイクル**
+   - プロの回答がVector DBに自動インデックス化
+   - AI回答の精度が継続的に向上
+
+3. **リワードシステム**
+   - プロの回答に対して需給と評価に基づくリワード
+   - リアルタイムで報酬計算
+
+### アーキテクチャ
+
+```
+Client (React + KMP)
+    ↓ GraphQL
+Gateway
+    ↓ gRPC
+┌──────────────┬─────────────┬──────────────┐
+│ QuestionSvc  │  ChatSvc    │ AIAnswerSvc  │
+│ (ロジック)   │ (データ)    │ (RAG)        │
+└──────────────┴─────────────┴──────────────┘
+                    ↓ Pub/Sub
+            Message Broker (イベント駆動)
+```
+
+**サービスの責任分離:**
+- **QuestionService**: 質問管理、マッチングロジック、Question↔Chat紐付け
+- **ChatService**: メッセージ保存・取得のみ (Thin Layer)
+- **AIAnswerService**: RAGによるAI回答生成、プロ回答から学習
+- **RewardService**: リワード計算・支払い
 
 ## ドキュメント
 - **要求仕様**: [docs/01_requirement.md](docs/01_requirement.md)
 - **アーキテクチャ**: [docs/02_architecture.md](docs/02_architecture.md)
+- **開発ガイド**: [CLAUDE.md](CLAUDE.md) - サービス間連携の詳細
 
 ## 開発環境
 - Go: 1.24.4

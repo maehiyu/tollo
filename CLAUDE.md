@@ -154,6 +154,121 @@ const UserCreatePage = () => {
 
 ## バックエンドサービス
 
+### サービス間連携とデータフロー
+
+本プロジェクトでは、各サービスが明確な責務を持ち、イベント駆動で連携します。
+
+#### QuestionService (質問管理・ビジネスロジック)
+**責務:**
+- 質問の永続化・管理
+- AI回答の要否判定
+- プロマッチングロジック
+- Question ↔ Chat の紐付け管理
+- リワード計算のトリガー
+
+**データモデル:**
+```go
+type Question struct {
+    ID              string
+    UserID          string
+    Content         string
+    RequireAI       bool         // AI経由するか
+    AIAnswerID      *string      // AI回答への参照
+    ChatID          *string      // Chat への参照
+    Status          QuestionStatus
+    ProfessionalID  *string      // マッチしたプロ
+}
+
+type QuestionStatus int
+const (
+    Open      QuestionStatus = iota  // AI回答済み、プロ待ち
+    Matched                           // プロとマッチング済み
+    Answered                          // 回答完了
+    Closed                            // クローズ
+)
+```
+
+#### ChatService (データストア層 - Thin Layer)
+**責務:**
+- メッセージの保存と取得のみ
+- Chat の CRUD
+- Message の CRUD
+- ユーザーのチャット一覧取得
+- ❌ ビジネスロジックは持たない
+
+**データモデル:**
+```go
+type Chat struct {
+    ID              string
+    QuestionID      *string      // Question から来た場合の参照
+    GeneralUserID   string
+    ProfessionalID  *string      // マッチング前は null
+}
+
+type Message struct {
+    ID          string
+    ChatID      string
+    SenderID    string
+    Type        MessageType  // STANDARD, AI_ANSWER, PRO_ANSWER, etc
+    Content     string
+}
+```
+
+#### AIAnswerService (RAG - AI回答生成)
+**責務:**
+- RAGによるAI回答生成
+- プロの回答からナレッジベース構築
+- Vector DBへのインデックス化
+
+**データソース:**
+- ChatService内のプロの回答 (type=PRO_ANSWER) をRAGのソースとする
+- イベント駆動でリアルタイムに学習
+
+**イベントフロー:**
+```
+ChatService: プロが回答
+    ↓ イベント発行
+MessageCreated (type=PRO_ANSWER)
+    ↓ Pub/Sub
+AIAnswerService: イベント購読
+    ↓
+Vector DBにインデックス化
+    ↓
+次回のAI回答生成時に活用
+```
+
+#### ユーザーフロー全体像
+
+```
+ユーザーが質問入力
+    ↓
+┌────────────────────────────────────────┐
+│ ユーザーの選択                          │
+│ 1. AIに聞く → AI回答後、プロ検討       │
+│ 2. 最初からプロに聞く                   │
+└────────────────────────────────────────┘
+    ↓
+QuestionService で Question 作成
+    ↓
+    ├─ AIに聞く場合
+    │    ↓ AIAnswerService (RAG)
+    │    AI回答 + 精度スコア
+    │    ↓ ユーザー判断
+    │    プロにも聞く? → Yes
+    │         ↓
+    └─ 最初からプロの場合
+         ↓
+    プロマッチング (QuestionService)
+         ↓
+    Chat作成 (ChatService)
+         ↓
+    Chat一覧に表示 (AI回答もChat UI、プロ回答もChat UI)
+         ↓
+    プロが回答 → MessageCreated イベント
+         ↓
+    AIAnswerService が学習 (Vector DB)
+```
+
 ### サービス追加時の手順
 
 1. **Protocol Buffers定義**
@@ -164,15 +279,25 @@ const UserCreatePage = () => {
 
 2. **サービス実装**
    ```bash
-   # services/servicename/ に実装
-   # - main.go
-   # - handler.go
+   # internal/servicename/ に実装
+   # - server.go (gRPC Server)
+   # - usecase.go (ビジネスロジック)
+   # - domain/ (ドメインモデル)
    ```
 
 3. **Gateway統合**
    ```bash
    # internal/gateway/graph/schema.graphqls にスキーマ追加
    # internal/gateway/graph/resolver.go にリゾルバ追加
+   ```
+
+4. **イベント駆動連携 (必要な場合)**
+   ```go
+   // イベント発行
+   eventBus.Publish(EventName{...})
+
+   // イベント購読
+   eventBus.Subscribe("EventName", handlerFunc)
    ```
 
 ## 開発ワークフロー
