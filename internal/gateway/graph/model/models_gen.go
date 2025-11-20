@@ -117,7 +117,6 @@ type QuestionMessageInput struct {
 
 type SendMessageInput struct {
 	ChatID      string                   `json:"chatId"`
-	SenderID    string                   `json:"senderId"`
 	Standard    *StandardMessageInput    `json:"standard,omitempty"`
 	Question    *QuestionMessageInput    `json:"question,omitempty"`
 	Answer      *AnswerMessageInput      `json:"answer,omitempty"`
