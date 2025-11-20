@@ -34,9 +34,11 @@ func (r *chatResolver) ProfessionalUser(ctx context.Context, obj *model.Chat) (*
 
 // SendMessage is the resolver for the sendMessage field.
 func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMessageInput) (*model.Message, error) {
+	senderID := auth.MustGetUserIDFromContext(ctx)
+
 	req := &chatpb.SendMessageRequest{
 		ChatId:   input.ChatID,
-		SenderId: input.SenderID,
+		SenderId: senderID,
 	}
 
 	if input.Standard != nil {
