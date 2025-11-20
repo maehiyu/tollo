@@ -404,8 +404,55 @@ cd webApp
 npm run dev  # ホットリロードで自動反映
 ```
 
+## イベント駆動実装戦略
+
+### Message Broker: NATS JetStream (推奨)
+
+**選定理由:**
+- Go製で軽量・高速
+- gRPCマイクロサービスとの相性抜群
+- セットアップが簡単
+- 永続化サポート (JetStream)
+- CNCF プロジェクト
+
+**代替案:**
+- RabbitMQ: 成熟、管理UIが優秀
+- Kafka: 超高スループット、大規模向け (オーバーキル)
+- Redis Streams: 既存Redis活用、シンプル
+
+### 実装の段階的アプローチ
+
+```
+Phase 1: 同期的gRPC実装
+  - 各サービスをgRPCで実装
+  - 動作確認・テスト完了
+  ↓
+Phase 2: NATS導入
+  - Docker Composeに追加
+  - イベントバス抽象層を作成
+  ↓
+Phase 3: 段階的にイベント駆動化
+  - QuestionCreated → AIAnswerService
+  - MessageCreated (PRO_ANSWER) → AIAnswerService
+  - AnswerCreated → RewardService
+```
+
+**NATS使用例:**
+```go
+// Publish
+nc, _ := nats.Connect(nats.DefaultURL)
+js, _ := nc.JetStream()
+js.Publish("question.created", questionData)
+
+// Subscribe
+js.Subscribe("question.created", func(msg *nats.Msg) {
+    // イベント処理
+})
+```
+
 ## 参考リンク
 
 - [要求仕様](docs/01_requirement.md)
 - [アーキテクチャ詳細](docs/02_architecture.md)
+- [システム全体像 (Mermaid図)](docs/03_system_overview.md)
 - [WebApp README](client/webApp/README.md)
